@@ -1,0 +1,146 @@
+[
+  {
+    "id": "AP-A01",
+    "entrada": "GGACgaaGTCC#ATGATG",
+    "esperado": "ACEITA",
+    "regra": "Caso-limite: menor cadeia aceita (|w|=4, alça=3, região=6; 18 símbolos)"
+  },
+  {
+    "id": "AP-A02",
+    "entrada": "GATCCgaaaGGATC#ATGGCAATGGCA",
+    "esperado": "ACEITA",
+    "regra": "Hastes complementares (5 pares), alça 4, região par 12"
+  },
+  {
+    "id": "AP-A03",
+    "entrada": "CAGTGttcgCACTG#AAGCTTAAGCTT",
+    "esperado": "ACEITA",
+    "regra": "Hastes complementares (5 pares), alça 4, região par 12"
+  },
+  {
+    "id": "AP-A04",
+    "entrada": "TTGCAGCcttgGCTGCAA#CCGGAACCGGAA",
+    "esperado": "ACEITA",
+    "regra": "Haste longa (7 pares): pilha com 7 bases antes de desempilhar"
+  },
+  {
+    "id": "AP-A05",
+    "entrada": "ACGTACGTaaaACGTACGT#TATATA",
+    "esperado": "ACEITA",
+    "regra": "Haste autocomplementar (palíndromo biológico) e região par 6; o AP não confere cópia"
+  },
+  {
+    "id": "AP-A06",
+    "entrada": "GCGCtttGCGC#GATTACAGATTACA",
+    "esperado": "ACEITA",
+    "regra": "Haste mínima (4 pares) e região par 14"
+  },
+  {
+    "id": "AP-A07",
+    "entrada": "AATTCCGGgacCCGGAATT#TGCATGCA",
+    "esperado": "ACEITA",
+    "regra": "Haste de 8 pares e região par 8"
+  },
+  {
+    "id": "AP-A08",
+    "entrada": "CCCCaaaaGGGG#ATGATGATGATG",
+    "esperado": "ACEITA",
+    "regra": "Haste homopolimérica C/G e região par 12"
+  },
+  {
+    "id": "AP-A09",
+    "entrada": "TGACctgGTCA#ACGTTGACGTTG",
+    "esperado": "ACEITA",
+    "regra": "Haste mínima e região par 12"
+  },
+  {
+    "id": "AP-A10",
+    "entrada": "GGACgaaGTCC#ATGATGAT",
+    "esperado": "ACEITA",
+    "regra": "Região par 8 que não é cópia: o AP aceita (regra de cópia é do ALL)"
+  },
+  {
+    "id": "AP-R01",
+    "entrada": "GGACgaaGTCA#ATGATG",
+    "esperado": "REJEITA",
+    "regra": "Pareamento: 4ª base da haste 3' ('A') não é complementar ao topo 'G'"
+  },
+  {
+    "id": "AP-R02",
+    "entrada": "GGACTgaaAGTC#ATGATG",
+    "esperado": "REJEITA",
+    "regra": "Haste 3' mais curta: '#' lido com base ainda na pilha"
+  },
+  {
+    "id": "AP-R03",
+    "entrada": "GGACgaaGTCCA#ATGATG",
+    "esperado": "REJEITA",
+    "regra": "Haste 3' mais longa: base lida com apenas Z na pilha"
+  },
+  {
+    "id": "AP-R04",
+    "entrada": "GGCgaaaGCC#ATGATGAT",
+    "esperado": "REJEITA",
+    "regra": "Haste 5' com só 3 bases (mínimo 4)"
+  },
+  {
+    "id": "AP-R05",
+    "entrada": "GGACgaGTCC#ATGATGAT",
+    "esperado": "REJEITA",
+    "regra": "Alça com só 2 bases (mínimo 3)"
+  },
+  {
+    "id": "AP-R06",
+    "entrada": "GGACGTCC#ATGATGATGA",
+    "esperado": "REJEITA",
+    "regra": "Sem alça: '#' lido ainda na haste 5'"
+  },
+  {
+    "id": "AP-R07",
+    "entrada": "GGACgaaGTCC#ATGATGA",
+    "esperado": "REJEITA",
+    "regra": "Região de repetição com comprimento ímpar (7)"
+  },
+  {
+    "id": "AP-R08",
+    "entrada": "GGACTgaaaAGTCC#ATGA",
+    "esperado": "REJEITA",
+    "regra": "Região de repetição com menos de 6 bases (4)"
+  },
+  {
+    "id": "AP-R09",
+    "entrada": "GGACTTCAgaaaTGAAGTCC",
+    "esperado": "REJEITA",
+    "regra": "Sem separador '#' nem região de repetição"
+  },
+  {
+    "id": "AP-R10",
+    "entrada": "GGACgaaGTCC#ATG#ATGAT",
+    "esperado": "REJEITA",
+    "regra": "Separador '#' repetido"
+  },
+  {
+    "id": "AP-R11",
+    "entrada": "GGACgaaGTCC#ATGatgATG",
+    "esperado": "REJEITA",
+    "regra": "Minúscula na região de repetição"
+  },
+  {
+    "id": "AP-R12",
+    "entrada": "gaaGGACGTCC#ATGATGAT",
+    "esperado": "REJEITA",
+    "regra": "Cadeia começa pela alça (haste 5' vazia)"
+  },
+  {
+    "id": "AP-R13",
+    "entrada": "",
+    "esperado": "REJEITA",
+    "regra": "Caso-limite: entrada vazia"
+  },
+  {
+    "id": "AP-R14",
+    "entrada": "GGACgaaGTCC#ATGAT",
+    "esperado": "REJEITA",
+    "regra": "Caso-limite: 17 símbolos, um a menos que o mínimo (região com 5 bases)"
+  }
+]

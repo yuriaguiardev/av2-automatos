@@ -1,0 +1,134 @@
+[
+  {
+    "id": "ALL-A01",
+    "entrada": "ATGGCATTGATGGCATTG",
+    "esperado": "ACEITA",
+    "regra": "Cópia exata, |u| = 9 (18 símbolos)"
+  },
+  {
+    "id": "ALL-A02",
+    "entrada": "GATTACAGATAGATTACAGATA",
+    "esperado": "ACEITA",
+    "regra": "Cópia exata, |u| = 11"
+  },
+  {
+    "id": "ALL-A03",
+    "entrada": "ACGTACGTACACGTACGTAC",
+    "esperado": "ACEITA",
+    "regra": "Cópia exata, |u| = 10"
+  },
+  {
+    "id": "ALL-A04",
+    "entrada": "TTTTTTTTTTTTTTTTTT",
+    "esperado": "ACEITA",
+    "regra": "Cópia exata homopolimérica, |u| = 9"
+  },
+  {
+    "id": "ALL-A05",
+    "entrada": "CAGCAGCAGCAGCAGCAG",
+    "esperado": "ACEITA",
+    "regra": "Repetição CAG (u = CAGCAGCAG), |u| = 9"
+  },
+  {
+    "id": "ALL-A06",
+    "entrada": "AAGCTTGGCCAAGCTTGGCC",
+    "esperado": "ACEITA",
+    "regra": "Cópia exata, |u| = 10"
+  },
+  {
+    "id": "ALL-A07",
+    "entrada": "TGCATGCATGTGCATGCATG",
+    "esperado": "ACEITA",
+    "regra": "Cópia exata, |u| = 10"
+  },
+  {
+    "id": "ALL-A08",
+    "entrada": "GGATCCGAATTCGGATCCGAATTC",
+    "esperado": "ACEITA",
+    "regra": "Cópia exata (sítios BamHI+EcoRI), |u| = 12"
+  },
+  {
+    "id": "ALL-A09",
+    "entrada": "ACACACACACACACACACAC",
+    "esperado": "ACEITA",
+    "regra": "Cópia exata, |u| = 10"
+  },
+  {
+    "id": "ALL-A10",
+    "entrada": "AA",
+    "esperado": "ACEITA",
+    "regra": "Caso-limite: menor cadeia aceita (|u| = 1)"
+  },
+  {
+    "id": "ALL-R01",
+    "entrada": "ATGGCATTGATGGCATTC",
+    "esperado": "REJEITA",
+    "regra": "Última base da 2ª cópia difere"
+  },
+  {
+    "id": "ALL-R02",
+    "entrada": "ATGGCATTGATGGCATTGA",
+    "esperado": "REJEITA",
+    "regra": "Comprimento ímpar (19)"
+  },
+  {
+    "id": "ALL-R03",
+    "entrada": "CAGCAGCAGCAGCAGCAA",
+    "esperado": "REJEITA",
+    "regra": "Última base difere (CAG…CAA)"
+  },
+  {
+    "id": "ALL-R04",
+    "entrada": "GATTACAGATACATTACAGATA",
+    "esperado": "REJEITA",
+    "regra": "1ª base da 2ª cópia difere"
+  },
+  {
+    "id": "ALL-R05",
+    "entrada": "TTTTTTTTTATTTTTTTT",
+    "esperado": "REJEITA",
+    "regra": "1ª base da 2ª cópia difere (A no lugar de T)"
+  },
+  {
+    "id": "ALL-R06",
+    "entrada": "AAAAAAAAACCCCCCCCC",
+    "esperado": "REJEITA",
+    "regra": "Mesma quantidade nas metades, mas conteúdos diferentes (A^9 C^9)"
+  },
+  {
+    "id": "ALL-R07",
+    "entrada": "ACGTACGTACCATGCATGCA",
+    "esperado": "REJEITA",
+    "regra": "Segunda metade é o reverso (u u^R): aceitável por pilha, não é cópia"
+  },
+  {
+    "id": "ALL-R08",
+    "entrada": "GGATCCGAATTCGAATTCGGATCC",
+    "esperado": "REJEITA",
+    "regra": "Blocos trocados de ordem"
+  },
+  {
+    "id": "ALL-R09",
+    "entrada": "ACGTTGCAACGTTGCAAC",
+    "esperado": "REJEITA",
+    "regra": "Comprimento par (18) mas deslocada: u ≠ v"
+  },
+  {
+    "id": "ALL-R10",
+    "entrada": "",
+    "esperado": "REJEITA",
+    "regra": "Caso-limite: entrada vazia"
+  },
+  {
+    "id": "ALL-R11",
+    "entrada": "A",
+    "esperado": "REJEITA",
+    "regra": "Caso-limite: um único símbolo (ímpar)"
+  },
+  {
+    "id": "ALL-R12",
+    "entrada": "AC",
+    "esperado": "REJEITA",
+    "regra": "Caso-limite: comprimento mínimo par com metades diferentes"
+  }
+]

@@ -1,0 +1,24 @@
+INT-2 — Rejeitada pelo AP: 'G' na haste 3' não pareia com o topo 'G'
+
+Rastreamento do AP para 'GATCCgaaaGGATG#ATGGCAATGGCA' (n = 27)
+Passo | Estado | Pos | Leitura (lido|restante)      | Pilha (topo→base) | Transição aplicada
+------+--------+-----+------------------------------+-------------------+---------------------------
+0     | q0     | 1   | |GATCCgaaaGGATG#ATGGCAATGGCA | Z                 | configuração inicial
+1     | q1     | 2   | G|ATCCgaaaGGATG#ATGGCAATGGCA | GZ                | T1: δ(q0, G, Z) = (q1, GZ)
+2     | q2     | 3   | GA|TCCgaaaGGATG#ATGGCAATGGCA | AGZ               | T2: δ(q1, A, G) = (q2, AG)
+3     | q3     | 4   | GAT|CCgaaaGGATG#ATGGCAATGGCA | TAGZ              | T3: δ(q2, T, A) = (q3, TA)
+4     | q4     | 5   | GATC|CgaaaGGATG#ATGGCAATGGCA | CTAGZ             | T4: δ(q3, C, T) = (q4, CT)
+5     | q4     | 6   | GATCC|gaaaGGATG#ATGGCAATGGCA | CCTAGZ            | T5: δ(q4, C, C) = (q4, CC)
+6     | q5     | 7   | GATCCg|aaaGGATG#ATGGCAATGGCA | CCTAGZ            | T6: δ(q4, g, C) = (q5, C)
+7     | q6     | 8   | GATCCga|aaGGATG#ATGGCAATGGCA | CCTAGZ            | T7: δ(q5, a, C) = (q6, C)
+8     | q7     | 9   | GATCCgaa|aGGATG#ATGGCAATGGCA | CCTAGZ            | T8: δ(q6, a, C) = (q7, C)
+9     | q7     | 10  | GATCCgaaa|GGATG#ATGGCAATGGCA | CCTAGZ            | T9: δ(q7, a, C) = (q7, C)
+10    | q8     | 11  | GATCCgaaaG|GATG#ATGGCAATGGCA | CTAGZ             | T10: δ(q7, G, C) = (q8, ε)
+11    | q8     | 12  | GATCCgaaaGG|ATG#ATGGCAATGGCA | TAGZ              | T11: δ(q8, G, C) = (q8, ε)
+12    | q8     | 13  | GATCCgaaaGGA|TG#ATGGCAATGGCA | AGZ               | T11: δ(q8, A, T) = (q8, ε)
+13    | q8     | 14  | GATCCgaaaGGAT|G#ATGGCAATGGCA | GZ                | T11: δ(q8, T, A) = (q8, ε)
+Decisão do AP: REJEITA — Sem transição: Pareamento inválido: a base 'G' na posição 14 não é complementar ao topo da pilha 'G' (esperado 'C').
+
+Etapa 1 - AP : REJEITA  -> Sem transição: Pareamento inválido: a base 'G' na posição 14 não é complementar ao topo da pilha 'G' (esperado 'C').
+Etapa 2 - ALL: sem execução (a cadeia foi rejeitada pelo AP).
+Decisão final: REJEITA (AP)

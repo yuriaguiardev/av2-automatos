@@ -1,0 +1,32 @@
+Derivação mais à esquerda de 'GATCCgaaaGGATC#ATGGCAATGGCA' na GLC
+#  | Produção             | Forma sentencial
+---+----------------------+----------------------------
+0  |                      | S
+1  | P1: S → H # R        | H#R
+2  | P4: H → G H C        | GHC#R
+3  | P6: H → A I T        | GAITC#R
+4  | P13: I → T J A       | GATJATC#R
+5  | P15: J → C K G       | GATCKGATC#R
+6  | P19: K → C L G       | GATCCLGGATC#R
+7  | P22: L → N L         | GATCCNLGGATC#R
+8  | P26: N → g           | GATCCgLGGATC#R
+9  | P23: L → N N N       | GATCCgNNNGGATC#R
+10 | P24: N → a           | GATCCgaNNGGATC#R
+11 | P24: N → a           | GATCCgaaNGGATC#R
+12 | P24: N → a           | GATCCgaaaGGATC#R
+13 | P28: R → B B R       | GATCCgaaaGGATC#BBR
+14 | P30: B → A           | GATCCgaaaGGATC#ABR
+15 | P33: B → T           | GATCCgaaaGGATC#ATR
+16 | P28: R → B B R       | GATCCgaaaGGATC#ATBBR
+17 | P32: B → G           | GATCCgaaaGGATC#ATGBR
+18 | P32: B → G           | GATCCgaaaGGATC#ATGGR
+19 | P28: R → B B R       | GATCCgaaaGGATC#ATGGBBR
+20 | P31: B → C           | GATCCgaaaGGATC#ATGGCBR
+21 | P30: B → A           | GATCCgaaaGGATC#ATGGCAR
+22 | P29: R → B B B B B B | GATCCgaaaGGATC#ATGGCABBBBBB
+23 | P30: B → A           | GATCCgaaaGGATC#ATGGCAABBBBB
+24 | P33: B → T           | GATCCgaaaGGATC#ATGGCAATBBBB
+25 | P32: B → G           | GATCCgaaaGGATC#ATGGCAATGBBB
+26 | P32: B → G           | GATCCgaaaGGATC#ATGGCAATGGBB
+27 | P31: B → C           | GATCCgaaaGGATC#ATGGCAATGGCB
+28 | P30: B → A           | GATCCgaaaGGATC#ATGGCAATGGCA

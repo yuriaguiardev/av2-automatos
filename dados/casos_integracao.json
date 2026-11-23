@@ -1,0 +1,26 @@
+[
+  {
+    "id": "INT-1",
+    "entrada": "GATCCgaaaGGATC#ATGGCAATGGCA",
+    "esperado_ap": "ACEITA",
+    "esperado_all": "ACEITA",
+    "esperado": "ACEITA",
+    "regra": "Aceita pelos dois módulos: grampo válido e região = uu"
+  },
+  {
+    "id": "INT-2",
+    "entrada": "GATCCgaaaGGATG#ATGGCAATGGCA",
+    "esperado_ap": "REJEITA",
+    "esperado_all": "NÃO EXECUTA",
+    "esperado": "REJEITA (AP)",
+    "regra": "Rejeitada pelo AP: 'G' na haste 3' não pareia com o topo 'G'"
+  },
+  {
+    "id": "INT-3",
+    "entrada": "GATCCgaaaGGATC#ATGGCAATGGCT",
+    "esperado_ap": "ACEITA",
+    "esperado_all": "REJEITA",
+    "esperado": "REJEITA (ALL)",
+    "regra": "Aceita pelo AP e rejeitada pelo ALL: última base da 2ª cópia difere"
+  }
+]

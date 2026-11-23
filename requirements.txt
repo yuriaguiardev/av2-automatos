@@ -1,0 +1,3 @@
+# A aplicacao usa apenas a biblioteca padrao do Python (>= 3.10).
+# Dependencia usada somente para executar os testes automatizados:
+pytest>=7.0

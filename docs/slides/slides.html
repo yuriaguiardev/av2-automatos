@@ -1,0 +1,503 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Slides — Validador de construtos de DNA</title><style>
+@page { size: 1280px 720px; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #e5e7eb; }
+body { font-family: 'Segoe UI', Calibri, Arial, sans-serif; color: #0f172a; }
+.slide { width: 1280px; height: 720px; position: relative; overflow: hidden; background: #ffffff;
+         padding: 56px 72px 48px; page-break-after: always; break-after: page; margin: 0 auto; }
+.slide.escuro { background: #0b2545; color: #f8fafc; }
+h1 { font-size: 40px; margin: 0 0 22px; font-weight: 700; color: #0b2545; letter-spacing: -0.3px; }
+.escuro h1 { color: #ffffff; }
+h2 { font-size: 22px; margin: 0 0 10px; color: #0e7c7b; }
+p, li { font-size: 19px; line-height: 1.45; }
+ul { margin: 6px 0; padding-left: 24px; } li { margin: 4px 0; }
+code, .mono { font-family: Consolas, 'Courier New', monospace; }
+code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+.escuro code { background: #183a63; color: #e2e8f0; }
+.quem { position: absolute; right: 72px; bottom: 20px; font-size: 13px; color: #64748b; }
+.num { position: absolute; left: 72px; bottom: 20px; font-size: 13px; color: #94a3b8; }
+.escuro .quem, .escuro .num { color: #9fb3c8; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+.cols.c64 { grid-template-columns: 1.5fr 1fr; } .cols.c46 { grid-template-columns: 1fr 1.5fr; }
+.card { background: #f1f5f9; border-radius: 14px; padding: 18px 22px; }
+.card.teal { background: #e6f6f5; } .card.rosa { background: #fdecec; } .card.verde { background: #e9f7ee; }
+.escuro .card { background: #12355f; }
+.def { font-size: 20px; background: #e6f6f5; border-radius: 12px; padding: 14px 18px; margin: 8px 0 14px; }
+pre { font-family: Consolas, monospace; font-size: 16px; line-height: 1.35; margin: 0; white-space: pre; }
+table { border-collapse: collapse; width: 100%; }
+th { background: #0b2545; color: #fff; text-align: left; font-weight: 600; }
+th, td { padding: 4px 8px; font-size: 14.5px; }
+td { border-bottom: 1px solid #e2e8f0; }
+table.mono td { font-family: Consolas, monospace; font-size: 14px; }
+.fig svg { width: 100%; height: auto; }
+.grande { font-size: 60px; font-weight: 800; color: #0e7c7b; line-height: 1; }
+.lbl { font-size: 15px; color: #475569; margin-top: 6px; }
+.ok { color: #15803d; font-weight: 700; } .nok { color: #b91c1c; font-weight: 700; }
+.chip { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 15px; font-weight: 700; }
+.chip.ok { background: #dcfce7; } .chip.nok { background: #fee2e2; } .chip.cinza { background: #e2e8f0; color: #334155; }
+.fluxo { display: flex; align-items: center; gap: 14px; margin: 14px 0 26px; }
+.caixa { border-radius: 14px; padding: 14px 16px; text-align: center; font-size: 17px; font-weight: 600; background: #f1f5f9; min-width: 150px; }
+.caixa small { display: block; font-weight: 400; font-size: 14px; color: #475569; margin-top: 4px; }
+.caixa.ap { background: #dbeafe; } .caixa.all { background: #fde68a; } .caixa.fim { background: #dcfce7; }
+.seta { font-size: 30px; color: #64748b; }
+.fita { display: flex; gap: 4px; margin: 6px 0; }
+.fita span { width: 34px; height: 38px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #334155;
+             border-radius: 6px; font-family: Consolas, monospace; font-size: 19px; background: #fff; }
+.fita span.m { background: #dbeafe; } .fita span.l { background: #fef3c7; } .fita span.x { background: #dcfce7; }
+.fita span.h { outline: 3px solid #dc2626; outline-offset: 1px; }
+.base { display: inline-block; width: 30px; text-align: center; font-family: Consolas, monospace; font-size: 22px; font-weight: 700; }
+</style></head><body><section class="slide escuro">
+<div style="position:absolute;left:72px;top:150px;right:72px">
+  <div style="font-size:20px;color:#7dd3c8;font-weight:600">Linguagens Formais e Autômatos · Trabalho prático</div>
+  <div style="font-size:54px;font-weight:800;line-height:1.12;margin:18px 0 22px">Validador de construtos<br>de DNA sintético</div>
+  <div style="font-size:24px;color:#cbd5e1">Grampo verificado por <b style="color:#fff">Autômato de Pilha</b> ·
+  repetição em tandem verificada por <b style="color:#fff">Autômato Linearmente Limitado</b></div>
+  <div style="margin-top:48px;font-size:21px">João Rath &nbsp;·&nbsp; Pedro Paulo &nbsp;·&nbsp; Yuri Aguiar</div>
+</div>
+<div style="position:absolute;right:72px;top:70px;font-family:Consolas,monospace;font-size:26px;color:#7dd3c8;text-align:right;line-height:1.5">
+GATCC<span style="color:#fbbf24">gaaa</span>GGATC<br><span style="color:#94a3b8">#</span>ATGGCA·ATGGCA</div>
+<div class="num">1/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
+<h1>O problema: validar um construto antes da síntese</h1>
+<div class="cols">
+ <div class="card teal">
+  <h2>1. Grampo (hairpin)</h2>
+  <pre style="font-size:21px">       alça
+ 5' G A T C C  g
+    | | | | |    a
+ 3' C T A G G  a
+               a</pre>
+  <p style="font-size:17px;margin-top:10px">A haste 3' é o <b>complemento reverso</b> da haste 5' (A↔T, C↔G): a 1ª base pareia com a última.
+  Haste ≥ 4 pares · alça ≥ 3 bases (em <b>minúsculas</b>).</p>
+ </div>
+ <div class="card" style="background:#fef9e7">
+  <h2>2. Repetição em tandem (após #)</h2>
+  <p style="font-size:26px;font-family:Consolas,monospace;margin:22px 0"><span style="background:#fde68a;padding:2px 4px">ATGGCA</span><span style="background:#bfdbfe;padding:2px 4px">ATGGCA</span></p>
+  <p style="font-size:17px">A região deve ser <b>uu</b>: duas cópias idênticas e consecutivas (ex.: repetições <code>CAG</code>).
+  Unidade ≥ 3 bases, então a região tem comprimento par ≥ 6.</p>
+ </div>
+</div>
+<p style="margin-top:22px">Menor construto válido: <code>GGACgaaGTCC#ATGATG</code>, com <b>18 símbolos</b>.
+Base do domínio: Searls (1992), <i>The Linguistics of DNA</i>.</p>
+<div class="num">2/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
+<h1>Arquitetura: duas etapas, dois níveis de Chomsky</h1>
+<div class="fluxo">
+ <div class="caixa">Entrada<small>Σ = {A,C,G,T,a,c,g,t,#}</small></div><div class="seta">→</div>
+ <div class="caixa">Alfabeto<small>símbolo inválido ⇒ ERRO</small></div><div class="seta">→</div>
+ <div class="caixa ap">AP<small>estrutura livre de contexto</small></div><div class="seta">→</div>
+ <div class="caixa all">ALL<small>recebe só o trecho após #</small></div><div class="seta">→</div>
+ <div class="caixa fim">Decisão</div>
+</div>
+<table>
+<tr><th>Cenário</th><th>Entrada</th><th>AP</th><th>ALL</th></tr>
+<tr><td>1</td><td class="mono"><code>GATCCgaaaGGATC#ATGGCAATGGCA</code></td><td><span class="chip ok">aceita</span></td><td><span class="chip ok">aceita</span></td></tr>
+<tr><td>2</td><td class="mono"><code>GATCCgaaaGGATG#ATGGCAATGGCA</code></td><td><span class="chip nok">rejeita</span></td><td><span class="chip cinza">não executa</span></td></tr>
+<tr><td>3</td><td class="mono"><code>GATCCgaaaGGATC#ATGGCAATGGCT</code></td><td><span class="chip ok">aceita</span></td><td><span class="chip nok">rejeita</span></td></tr>
+</table>
+<p style="margin-top:20px"><b>Divisão de trabalho:</b> o AP verifica tudo o que é livre de contexto (hastes, alça, um único #, região par ≥ 6).
+O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª</b>.</p>
+<div class="num">3/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
+<h1>L₁ e a gramática livre de contexto</h1>
+<div class="def">L₁ = { w · x · cr(w) # y &nbsp;|&nbsp; w ∈ {A,C,G,T}<sup>k</sup>, k ≥ 4; &nbsp;x ∈ {a,c,g,t}<sup>m</sup>, m ≥ 3; &nbsp;y ∈ {A,C,G,T}<sup>2j</sup>, j ≥ 3 }
+<br><span style="font-size:16px;color:#475569">cr(w) = complemento reverso de w</span></div>
+<div class="cols c64">
+ <div><p style="margin:0 0 6px"><b>G = (V, T, P, S)</b>, V = {S,H,I,J,K,L,N,R,B}, T = Σ, 33 produções:</p>
+ <pre style="font-size:15.5px;background:#f8fafc;padding:12px;border-radius:10px">S → H # R
+H → A H T | C H G | G H C | T H A | A I T | C I G | G I C | T I A
+I → A J T | C J G | G J C | T J A
+J → A K T | C K G | G K C | T K A
+K → A L T | C L G | G L C | T L A
+L → N L | N N N
+N → a | c | g | t
+R → B B R | B B B B B B
+B → A | C | G | T</pre></div>
+ <div class="card"><h2>Como ler</h2><ul style="font-size:17px">
+  <li><code>H → X H X'</code> põe uma base e o seu complemento em <b>pontas opostas</b>: aninhamento</li>
+  <li>H → I → J → K forçam <b>≥ 4 pares</b></li>
+  <li>L → NL | NNN: alça ≥ 3</li>
+  <li>R → BBR | B⁶: região par ≥ 6</li></ul></div>
+</div>
+<div class="num">4/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
+<h1>Derivação mais à esquerda de <code style="font-size:34px">GGACgaaGTCC#ATGATG</code></h1>
+<div class="cols">
+ <table class="mono"><tr><th>#</th><th>Produção</th><th>Forma sentencial</th></tr><tr><td>0</td><td></td><td><code>S</code></td></tr><tr><td>1</td><td>S → H # R</td><td><code>H#R</code></td></tr><tr><td>2</td><td>H → G I C</td><td><code>GIC#R</code></td></tr><tr><td>3</td><td>I → G J C</td><td><code>GGJCC#R</code></td></tr><tr><td>4</td><td>J → A K T</td><td><code>GGAKTCC#R</code></td></tr><tr><td>5</td><td>K → C L G</td><td><code>GGACLGTCC#R</code></td></tr><tr><td>6</td><td>L → N N N</td><td><code>GGACNNNGTCC#R</code></td></tr><tr><td>7</td><td>N → g</td><td><code>GGACgNNGTCC#R</code></td></tr><tr><td>8</td><td>N → a</td><td><code>GGACgaNGTCC#R</code></td></tr><tr><td>9</td><td>N → a</td><td><code>GGACgaaGTCC#R</code></td></tr></table>
+ <div><table class="mono"><tr><th>#</th><th>Produção</th><th>Forma sentencial</th></tr><tr><td>10</td><td>R → B B B B B B</td><td><code>GGACgaaGTCC#BBBBBB</code></td></tr><tr><td>11</td><td>B → A</td><td><code>GGACgaaGTCC#ABBBBB</code></td></tr><tr><td>12</td><td>B → T</td><td><code>GGACgaaGTCC#ATBBBB</code></td></tr><tr><td>13</td><td>B → G</td><td><code>GGACgaaGTCC#ATGBBB</code></td></tr><tr><td>14</td><td>B → A</td><td><code>GGACgaaGTCC#ATGABB</code></td></tr><tr><td>15</td><td>B → T</td><td><code>GGACgaaGTCC#ATGATB</code></td></tr><tr><td>16</td><td>B → G</td><td><code>GGACgaaGTCC#ATGATG</code></td></tr></table>
+ <div class="card teal" style="margin-top:18px"><p style="font-size:17px;margin:0">Pares gerados de fora para dentro:
+ G…C, G…C, A…T, C…G. A haste 3' (GTCC) sai automaticamente como o complemento reverso de GGAC.</p></div></div>
+</div>
+<div class="num">5/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
+<h1>Autômato de Pilha M = (Q, Σ, Γ, δ, q0, Z, F)</h1>
+<div class="fig" style="margin-top:-6px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 470" width="1150" height="470">
+  <defs><marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/></marker></defs>
+  <style>
+    .seta { fill: none; stroke: #1f2937; stroke-width: 1.4; marker-end: url(#ponta); }
+    .no { font: 600 14px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .rot { font: 12px Consolas, 'Courier New', monospace; fill: #1e3a8a; }
+    .nota { font: 13px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .titulo { font: 700 17px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+  </style>
+  <rect width="100%" height="100%" fill="white"/>
+  <text x="20" y="28" class="titulo">Autômato de Pilha — estrutura do grampo (aceitação por estado final q15)</text>
+  <circle cx="95" cy="120" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="95" y="125" text-anchor="middle" class="no">q0</text>
+  <line x1="36" y1="120" x2="68" y2="120" class="seta"/>
+  <text x="34" y="140" class="rot" text-anchor="start">início</text>
+  <circle cx="217" cy="120" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="217" y="125" text-anchor="middle" class="no">q1</text>
+  <circle cx="339" cy="120" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="339" y="125" text-anchor="middle" class="no">q2</text>
+  <circle cx="461" cy="120" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="461" y="125" text-anchor="middle" class="no">q3</text>
+  <circle cx="583" cy="120" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="583" y="125" text-anchor="middle" class="no">q4</text>
+  <circle cx="705" cy="120" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="705" y="125" text-anchor="middle" class="no">q5</text>
+  <circle cx="827" cy="120" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="827" y="125" text-anchor="middle" class="no">q6</text>
+  <circle cx="949" cy="120" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="949" y="125" text-anchor="middle" class="no">q7</text>
+  <circle cx="1071" cy="120" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="1071" y="125" text-anchor="middle" class="no">q8</text>
+  <circle cx="1071" cy="330" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="1071" y="335" text-anchor="middle" class="no">q9</text>
+  <circle cx="949" cy="330" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="949" y="335" text-anchor="middle" class="no">q10</text>
+  <circle cx="827" cy="330" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="827" y="335" text-anchor="middle" class="no">q11</text>
+  <circle cx="705" cy="330" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="705" y="335" text-anchor="middle" class="no">q12</text>
+  <circle cx="583" cy="330" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="583" y="335" text-anchor="middle" class="no">q13</text>
+  <circle cx="461" cy="330" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="461" y="335" text-anchor="middle" class="no">q14</text>
+  <circle cx="339" cy="330" r="25" fill="#dcfce7" stroke="#1f2937" stroke-width="1.6"/>
+  <circle cx="339" cy="330" r="21" fill="none" stroke="#1f2937" stroke-width="1.4"/>
+  <text x="339" y="335" text-anchor="middle" class="no">q15</text>
+  <circle cx="140" cy="330" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="140" y="335" text-anchor="middle" class="no">q16</text>
+  <path d="M120.0,120.0 Q156.0,120.0 192.0,120.0" class="seta"/>
+  <text x="156.0" y="98.0" text-anchor="middle" class="rot">T1</text>
+  <text x="156.0" y="112.0" text-anchor="middle" class="rot">X,Z/XZ</text>
+  <path d="M242.0,120.0 Q278.0,120.0 314.0,120.0" class="seta"/>
+  <text x="278.0" y="98.0" text-anchor="middle" class="rot">T2</text>
+  <text x="278.0" y="112.0" text-anchor="middle" class="rot">X,Y/XY</text>
+  <path d="M364.0,120.0 Q400.0,120.0 436.0,120.0" class="seta"/>
+  <text x="400.0" y="98.0" text-anchor="middle" class="rot">T3</text>
+  <text x="400.0" y="112.0" text-anchor="middle" class="rot">X,Y/XY</text>
+  <path d="M486.0,120.0 Q522.0,120.0 558.0,120.0" class="seta"/>
+  <text x="522.0" y="98.0" text-anchor="middle" class="rot">T4</text>
+  <text x="522.0" y="112.0" text-anchor="middle" class="rot">X,Y/XY</text>
+  <path d="M572.1,97.5 C543.1,72.6 622.9,72.6 593.9,97.5" class="seta"/>
+  <text x="583.0" y="42.0" text-anchor="middle" class="rot">T5</text>
+  <text x="583.0" y="56.0" text-anchor="middle" class="rot">X,Y/XY</text>
+  <path d="M608.0,120.0 Q644.0,120.0 680.0,120.0" class="seta"/>
+  <text x="644.0" y="98.0" text-anchor="middle" class="rot">T6</text>
+  <text x="644.0" y="112.0" text-anchor="middle" class="rot">x,Y/Y</text>
+  <path d="M730.0,120.0 Q766.0,120.0 802.0,120.0" class="seta"/>
+  <text x="766.0" y="98.0" text-anchor="middle" class="rot">T7</text>
+  <text x="766.0" y="112.0" text-anchor="middle" class="rot">x,Y/Y</text>
+  <path d="M852.0,120.0 Q888.0,120.0 924.0,120.0" class="seta"/>
+  <text x="888.0" y="98.0" text-anchor="middle" class="rot">T8</text>
+  <text x="888.0" y="112.0" text-anchor="middle" class="rot">x,Y/Y</text>
+  <path d="M938.1,97.5 C909.1,72.6 988.9,72.6 959.9,97.5" class="seta"/>
+  <text x="949.0" y="42.0" text-anchor="middle" class="rot">T9</text>
+  <text x="949.0" y="56.0" text-anchor="middle" class="rot">x,Y/Y</text>
+  <path d="M974.0,120.0 Q1010.0,120.0 1046.0,120.0" class="seta"/>
+  <text x="1010.0" y="98.0" text-anchor="middle" class="rot">T10</text>
+  <text x="1010.0" y="112.0" text-anchor="middle" class="rot">X,X&#x27;/ε</text>
+  <path d="M1060.1,97.5 C1031.1,72.6 1110.9,72.6 1081.9,97.5" class="seta"/>
+  <text x="1071.0" y="42.0" text-anchor="middle" class="rot">T11</text>
+  <text x="1071.0" y="56.0" text-anchor="middle" class="rot">X,X&#x27;/ε</text>
+  <path d="M1071.0,145.0 Q1071.0,225.0 1071.0,305.0" class="seta"/>
+  <text x="1081.0" y="225.0" text-anchor="start" class="rot">T12</text>
+  <text x="1081.0" y="239.0" text-anchor="start" class="rot">#,Z/Z</text>
+  <path d="M1046.0,330.0 Q1010.0,330.0 974.0,330.0" class="seta"/>
+  <text x="1010.0" y="354.0" text-anchor="middle" class="rot">T13</text>
+  <text x="1010.0" y="368.0" text-anchor="middle" class="rot">X,Z/Z</text>
+  <path d="M924.0,330.0 Q888.0,330.0 852.0,330.0" class="seta"/>
+  <text x="888.0" y="354.0" text-anchor="middle" class="rot">T14</text>
+  <text x="888.0" y="368.0" text-anchor="middle" class="rot">X,Z/Z</text>
+  <path d="M802.0,330.0 Q766.0,330.0 730.0,330.0" class="seta"/>
+  <text x="766.0" y="354.0" text-anchor="middle" class="rot">T15</text>
+  <text x="766.0" y="368.0" text-anchor="middle" class="rot">X,Z/Z</text>
+  <path d="M680.0,330.0 Q644.0,330.0 608.0,330.0" class="seta"/>
+  <text x="644.0" y="354.0" text-anchor="middle" class="rot">T16</text>
+  <text x="644.0" y="368.0" text-anchor="middle" class="rot">X,Z/Z</text>
+  <path d="M558.0,330.0 Q522.0,330.0 486.0,330.0" class="seta"/>
+  <text x="522.0" y="354.0" text-anchor="middle" class="rot">T17</text>
+  <text x="522.0" y="368.0" text-anchor="middle" class="rot">X,Z/Z</text>
+  <path d="M436.0,330.0 Q400.0,330.0 364.0,330.0" class="seta"/>
+  <text x="400.0" y="354.0" text-anchor="middle" class="rot">T18</text>
+  <text x="400.0" y="368.0" text-anchor="middle" class="rot">X,Z/Z</text>
+  <path d="M315.1,337.2 Q239.5,360.0 163.9,337.2" class="seta"/>
+  <text x="239.5" y="368.60839741881784" text-anchor="middle" class="rot">T19  X,Z/Z</text>
+  <path d="M163.9,322.8 Q239.5,300.0 315.1,322.8" class="seta"/>
+  <text x="239.5" y="303.39160258118216" text-anchor="middle" class="rot">T20  X,Z/Z</text>
+  <text x="20" y="420" class="nota">X, Y ∈ {A,C,G,T};  x ∈ {a,c,g,t};  X&#x27; = complemento de X (A↔T, C↔G).</text>
+  <text x="20" y="436" class="nota">Rótulo  a,b/γ : lê a com b no topo e troca b por γ (γ = ε desempilha). Sem transição ⇒ rejeição. Estado final: q15.</text>
+</svg>
+</div>
+<div class="cols" style="gap:24px;margin-top:2px">
+ <p style="font-size:17px;margin:0"><b>17 estados</b> · Γ = {Z, A, C, G, T} · início (q0, entrada, Z) · <b>aceitação por estado final</b> F = {q15},
+ com a entrada consumida por inteiro.</p>
+ <p style="font-size:17px;margin:0"><b>Determinístico, sem ε</b>: a minúscula marca o fim da haste 5', então não é preciso adivinhar o meio.
+ 20 regras esquemáticas geram 173 transições concretas.</p>
+</div>
+<div class="num">6/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
+<h1>Como a pilha decide</h1>
+<div class="cols c46">
+ <div class="card">
+  <h2>As 4 fases do AP</h2>
+  <ul style="font-size:17.5px">
+  <li><b>q0→q4</b> (T1–T5): <b>empilha</b> a haste 5'</li>
+  <li><b>q5→q7</b> (T6–T9): lê a alça, pilha intacta</li>
+  <li><b>q8</b> (T10–T11): <b>desempilha</b> se a base lida for o complemento do topo</li>
+  <li><b>T12</b>: lê <code>#</code> só com Z no topo</li>
+  <li><b>q9→q16</b> (T13–T20): conta a região; para em q15 se for par ≥ 6</li></ul>
+  <p style="font-size:16px;color:#475569">Sem transição ⇒ rejeita na hora.</p>
+ </div>
+ <div>
+  <table class="mono"><tr><th>Passo</th><th>Estado</th><th>Lido | restante</th><th>Pilha</th></tr>
+  <tr><td>0</td><td>q0</td><td>|GGACgaaGTCC#…</td><td>Z</td></tr>
+  <tr><td>4</td><td>q4</td><td>GGAC|gaaGTCC#…</td><td>CAGGZ</td></tr>
+  <tr><td>7</td><td>q7</td><td>…gaa|GTCC#…</td><td>CAGGZ</td></tr>
+  <tr><td>8</td><td>q8</td><td>…G|TCC#…</td><td>AGGZ</td></tr>
+  <tr><td>11</td><td>q8</td><td>…GTCC|#ATGATG</td><td>Z</td></tr>
+  <tr><td>12</td><td>q9</td><td>…#|ATGATG</td><td>Z</td></tr>
+  <tr><td>18</td><td><b>q15</b></td><td>…ATGATG|</td><td>Z</td></tr></table>
+  <p style="font-size:17px">A última base empilhada (C) é a primeira a ser casada (G): <b>LIFO = aninhamento</b>.</p>
+ </div>
+</div>
+<div class="num">7/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
+<h1>Por que L(AP) = L(G) e por que L₁ não é regular</h1>
+<div class="cols">
+ <div class="card teal"><h2>GLC ↔ AP</h2><ul style="font-size:17px">
+ <li>Cada <code>X·H·X'</code> da gramática corresponde a <b>empilhar X</b> e, depois, <b>desempilhar ao ler X'</b></li>
+ <li>Invariante em q8: lido z = cr(w''), pilha = w'ᴿZ, com w = w'w''</li>
+ <li>T12 só com Z ⇒ hastes de mesmo tamanho e complementares</li>
+ <li>Níveis H/I/J/K ↔ q1–q4; L ↔ q5–q7; R ↔ q9–q16</li>
+ <li>Testado: 4000 cadeias com a mesma decisão no AP e na definição</li></ul></div>
+ <div class="card"><h2>Não regular (bombeamento)</h2>
+ <p style="font-size:17px">s = A<sup>p</sup> aaa T<sup>p</sup> #AAAAAA ∈ L₁. Com |xy| ≤ p, temos y = A<sup>i</sup>.</p>
+ <p style="font-size:17px">xy²z = A<sup>p+i</sup> aaa T<sup>p</sup> #AAAAAA ∉ L₁, pois a haste 3' fica curta.</p>
+ <p style="font-size:17px">Um AFD precisaria lembrar uma haste de tamanho <b>ilimitado</b>. A pilha dá essa memória.</p></div>
+</div>
+<div class="num">8/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
+<h1>A dependência que a pilha não consegue verificar</h1>
+<div class="fig" style="max-width:1000px;margin:0 auto 10px"><svg viewBox="0 0 640 125" width="100%" style="max-width:640px"><style>.ft{font:600 12px 'Segoe UI',Arial}.fs{font:15px Consolas,monospace}</style><text x="20" y="18" class="ft">Grampo (L₁): dependências ANINHADAS — pilha (LIFO)</text><text x="20" y="110" class="fs" text-anchor="middle">G</text><text x="46" y="110" class="fs" text-anchor="middle">A</text><text x="72" y="110" class="fs" text-anchor="middle">T</text><text x="98" y="110" class="fs" text-anchor="middle">C</text><text x="124" y="110" class="fs" text-anchor="middle">g</text><text x="150" y="110" class="fs" text-anchor="middle">a</text><text x="176" y="110" class="fs" text-anchor="middle">a</text><text x="202" y="110" class="fs" text-anchor="middle">G</text><text x="228" y="110" class="fs" text-anchor="middle">A</text><text x="254" y="110" class="fs" text-anchor="middle">T</text><text x="280" y="110" class="fs" text-anchor="middle">C</text><path d="M20,94 C20,12 280,12 280,94" fill="none" stroke="#1d4ed8" stroke-width="1.6"/><path d="M46,94 C46,26 254,26 254,94" fill="none" stroke="#1d4ed8" stroke-width="1.6"/><path d="M72,94 C72,40 228,40 228,94" fill="none" stroke="#1d4ed8" stroke-width="1.6"/><path d="M98,94 C98,54 202,54 202,94" fill="none" stroke="#1d4ed8" stroke-width="1.6"/><text x="380" y="18" class="ft">Cópia uu (L₂): dependências CRUZADAS</text><text x="380" y="110" class="fs" text-anchor="middle">A</text><text x="406" y="110" class="fs" text-anchor="middle">T</text><text x="432" y="110" class="fs" text-anchor="middle">G</text><text x="458" y="110" class="fs" text-anchor="middle">C</text><text x="484" y="110" class="fs" text-anchor="middle">A</text><text x="510" y="110" class="fs" text-anchor="middle">T</text><text x="536" y="110" class="fs" text-anchor="middle">G</text><text x="562" y="110" class="fs" text-anchor="middle">C</text><path d="M380,94 C380,54 484,54 484,94" fill="none" stroke="#b91c1c" stroke-width="1.6"/><path d="M406,94 C406,54 510,54 510,94" fill="none" stroke="#b91c1c" stroke-width="1.6"/><path d="M432,94 C432,54 536,54 536,94" fill="none" stroke="#b91c1c" stroke-width="1.6"/><path d="M458,94 C458,54 562,54 562,94" fill="none" stroke="#b91c1c" stroke-width="1.6"/></svg></div>
+<div class="cols">
+ <div class="card rosa"><h2>L₂ = { uu | u ∈ {A,C,G,T}⁺ } não é LLC</h2>
+ <p style="font-size:16.5px">L₂ ∩ A⁺C⁺A⁺C⁺ = AⁱCʲAⁱCʲ. Pelo bombeamento para LLC, a janela vxy (≤ p) toca só 2 blocos <b>vizinhos</b>,
+ e bombear desequilibra o bloco correspondente. Como LLC é fechada sob ∩ regular, L₂ não pode ser LLC.</p></div>
+ <div class="card verde"><h2>L₂ é sensível ao contexto</h2>
+ <p style="font-size:16.5px">Construímos um ALL que a decide. Teorema de <b>Kuroda (1964)</b>: ALL ⇔ LSC.
+ A pilha é LIFO e a cópia pede ordem FIFO: <b>u₁ com u₁, u₂ com u₂…</b></p></div>
+</div>
+<div class="num">9/17</div><div class="quem">Apresenta: João</div></section><section class="slide ">
+<h1>Autômato Linearmente Limitado</h1>
+<div class="cols c64" style="gap:26px">
+ <div class="fig" style="margin-top:-14px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" width="1000" height="800">
+  <defs><marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/></marker></defs>
+  <style>
+    .seta { fill: none; stroke: #1f2937; stroke-width: 1.4; marker-end: url(#ponta); }
+    .no { font: 600 14px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .rot { font: 12px Consolas, 'Courier New', monospace; fill: #1e3a8a; }
+    .nota { font: 13px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .titulo { font: 700 17px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+  </style>
+  <rect width="100%" height="100%" fill="white"/>
+  <text x="20" y="28" class="titulo">Autômato Linearmente Limitado — repetição em tandem uu</text>
+  <circle cx="80" cy="130" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="80" y="135" text-anchor="middle" class="no">q0</text>
+  <line x1="21" y1="130" x2="53" y2="130" class="seta"/>
+  <text x="19" y="150" class="rot" text-anchor="start">início</text>
+  <circle cx="240" cy="130" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="240" y="135" text-anchor="middle" class="no">q1</text>
+  <circle cx="450" cy="130" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="450" y="135" text-anchor="middle" class="no">q2</text>
+  <circle cx="660" cy="130" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="660" y="135" text-anchor="middle" class="no">q3</text>
+  <circle cx="450" cy="290" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="450" y="295" text-anchor="middle" class="no">q4</text>
+  <circle cx="900" cy="130" r="25" fill="#fee2e2" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="900" y="135" text-anchor="middle" class="no">qrj</text>
+  <circle cx="240" cy="450" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="240" y="455" text-anchor="middle" class="no">q5</text>
+  <circle cx="560" cy="450" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="560" y="455" text-anchor="middle" class="no">q6</text>
+  <circle cx="560" cy="640" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="560" y="645" text-anchor="middle" class="no">q7</text>
+  <circle cx="300" cy="640" r="25" fill="#dcfce7" stroke="#1f2937" stroke-width="1.6"/>
+  <circle cx="300" cy="640" r="21" fill="none" stroke="#1f2937" stroke-width="1.4"/>
+  <text x="300" y="645" text-anchor="middle" class="no">qac</text>
+  <circle cx="860" cy="640" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="860" y="645" text-anchor="middle" class="no">qX</text>
+  <path d="M105.0,130.0 Q160.0,130.0 215.0,130.0" class="seta"/>
+  <text x="160.0" y="120.0" text-anchor="middle" class="rot">M1 &lt;/&lt;,D</text>
+  <path d="M265.0,130.0 Q345.0,130.0 425.0,130.0" class="seta"/>
+  <text x="345.0" y="120.0" text-anchor="middle" class="rot">M2 X/x,D</text>
+  <path d="M460.9,152.5 C489.9,177.4 410.1,177.4 439.1,152.5" class="seta"/>
+  <text x="450.0" y="202.0" text-anchor="middle" class="rot">M5 X/X,D</text>
+  <path d="M475.0,130.0 Q555.0,130.0 635.0,130.0" class="seta"/>
+  <text x="555.0" y="106.0" text-anchor="middle" class="rot">M6 x/x,E</text>
+  <text x="555.0" y="120.0" text-anchor="middle" class="rot">M7 &gt;/&gt;,E</text>
+  <path d="M640.1,145.2 Q555.0,210.0 469.9,274.8" class="seta"/>
+  <text x="567.0" y="214.0" text-anchor="start" class="rot">M8 X/x,E</text>
+  <path d="M460.9,312.5 C489.9,337.4 410.1,337.4 439.1,312.5" class="seta"/>
+  <text x="450.0" y="362.0" text-anchor="middle" class="rot">M10 X/X,E</text>
+  <path d="M430.1,274.8 Q345.0,210.0 259.9,145.2" class="seta"/>
+  <text x="333.0" y="214.0" text-anchor="end" class="rot">M11 x/x,D</text>
+  <path d="M685.0,130.0 Q780.0,130.0 875.0,130.0" class="seta"/>
+  <text x="780.0" y="150.0" text-anchor="middle" class="rot">M9 x/x,P</text>
+  <text x="780.0" y="164.0" text-anchor="middle" class="rot">(ímpar)</text>
+  <path d="M264.0,123.1 Q570.0,35.0 876.0,123.1" class="seta"/>
+  <text x="570.0" y="71.0419547186754" text-anchor="middle" class="rot">M4 &gt;/&gt;,P  (vazia)</text>
+  <path d="M240.0,155.0 Q240.0,290.0 240.0,425.0" class="seta"/>
+  <text x="230.0" y="290.0" text-anchor="end" class="rot">M3 x/X,D</text>
+  <text x="230.0" y="304.0" text-anchor="end" class="rot">(meio achado)</text>
+  <path d="M250.9,472.5 C279.9,497.4 200.1,497.4 229.1,472.5" class="seta"/>
+  <text x="240.0" y="522.0" text-anchor="middle" class="rot">M12 x/X,D</text>
+  <path d="M265.0,450.0 Q400.0,450.0 535.0,450.0" class="seta"/>
+  <text x="400.0" y="440.0" text-anchor="middle" class="rot">M13 &gt;/&gt;,E</text>
+  <path d="M582.5,439.1 C607.4,410.1 607.4,489.9 582.5,460.9" class="seta"/>
+  <text x="622.0" y="450.0" text-anchor="start" class="rot">M14 s/s,E</text>
+  <text x="622.0" y="464.0" text-anchor="start" class="rot">s∈{X,x,*}</text>
+  <path d="M560.0,475.0 Q560.0,545.0 560.0,615.0" class="seta"/>
+  <text x="550.0" y="545.0" text-anchor="end" class="rot">M15 &lt;/&lt;,D</text>
+  <path d="M570.9,662.5 C599.9,687.4 520.1,687.4 549.1,662.5" class="seta"/>
+  <text x="560.0" y="712.0" text-anchor="middle" class="rot">M16 */*,D</text>
+  <path d="M535.0,640.0 Q430.0,640.0 325.0,640.0" class="seta"/>
+  <text x="430.0" y="630.0" text-anchor="middle" class="rot">M18 &gt;/&gt;,P</text>
+  <path d="M585.0,640.0 Q710.0,640.0 835.0,640.0" class="seta"/>
+  <text x="710.0" y="630.0" text-anchor="middle" class="rot">M17 x/*,D</text>
+  <path d="M870.9,662.5 C899.9,687.4 820.1,687.4 849.1,662.5" class="seta"/>
+  <text x="860.0" y="712.0" text-anchor="middle" class="rot">M19 s/s,D</text>
+  <text x="860.0" y="726.0" text-anchor="middle" class="rot">s∈{x,*}</text>
+  <path d="M838.9,626.6 Q710.0,545.0 581.1,463.4" class="seta"/>
+  <text x="724.0" y="545.0" text-anchor="start" class="rot">M20 X/*,E</text>
+  <path d="M862.0,615.1 Q880.0,385.0 898.0,154.9" class="seta"/>
+  <text x="890.0" y="385.0" text-anchor="start" class="rot">M21 Y/Y,P</text>
+  <text x="890.0" y="399.0" text-anchor="start" class="rot">(Y≠X)</text>
+  <text x="20" y="765" class="nota">qX representa os 4 estados qA, qC, qG, qT (a base X lida da 1ª cópia fica &quot;guardada&quot; no estado).</text>
+  <text x="20" y="781" class="nota">X, Y ∈ {A,C,G,T}; x = minúscula de X; &#x27;*&#x27; = célula conferida.  Rótulo  lido/escrito,mov  (E, D, P). Sem transição ⇒ rejeição.</text>
+</svg>
+</div>
+ <div style="font-size:17px">
+  <p><b>M = (Q, Σ, Γ, δ, q0, &lt;, &gt;, qac, qrj)</b></p>
+  <ul style="font-size:16.5px">
+   <li><b>14 estados</b>: q0–q7, qA, qC, qG, qT, qac, qrj</li>
+   <li>Σ = {A,C,G,T}</li>
+   <li>Γ = Σ ∪ {a,c,g,t, *, &lt;, &gt;}</li>
+   <li>Início: q0 sobre <code>&lt;</code></li>
+   <li>δ(q, lido) = (p, escrito, E/D/P)</li>
+   <li>Aceita em <b>qac</b>; rejeita em <b>qrj</b> ou quando falta transição</li>
+   <li>Determinístico: 92 transições</li>
+  </ul>
+  <p style="font-size:15px;color:#475569">qX “carrega” no estado a base que está sendo comparada.</p>
+ </div>
+</div>
+<div class="num">10/17</div><div class="quem">Apresenta: João</div></section><section class="slide ">
+<h1>O algoritmo em 3 fases, na própria fita</h1>
+<div class="cols" style="grid-template-columns:0.9fr 1.1fr;gap:28px">
+ <div style="font-size:17px">
+  <p><b style="color:#0e7c7b">Fase 1: achar o meio</b> (q1–q4). Marca as pontas alternadamente (X→x). Se sobrar uma base sem par, o comprimento é ímpar e a cadeia é rejeitada (M9).</p>
+  <p><b style="color:#0e7c7b">Fase 2: restaurar</b> (q5). A 2ª metade volta a maiúsculas.</p>
+  <p><b style="color:#0e7c7b">Fase 3: comparar</b> (q6, q7, qX). Troca x por <code>*</code>, leva X no estado até a 1ª maiúscula: igual vira <code>*</code> (M20); diferente rejeita (M21). Só <code>*</code> ⇒ aceita.</p>
+ </div>
+ <div>
+  <p style="margin:0;font-size:15px;color:#475569">Entrada <code>ATGATG</code> (n = 6, fita com 8 células)</p>
+  <div style="display:flex;align-items:center;gap:12px"><div class="fita"><span class="m h">&lt;</span><span class="">A</span><span class="">T</span><span class="">G</span><span class="">A</span><span class="">T</span><span class="">G</span><span class="m">&gt;</span></div><span style="font-size:14px;color:#475569">passo 0 · q0 · início</span></div><div style="display:flex;align-items:center;gap:12px"><div class="fita"><span class="m">&lt;</span><span class="l">a</span><span class="">T</span><span class="">G</span><span class="">A</span><span class=" h">T</span><span class="l">g</span><span class="m">&gt;</span></div><span style="font-size:14px;color:#475569">passo 9 · q4 · M8: pontas marcadas</span></div><div style="display:flex;align-items:center;gap:12px"><div class="fita"><span class="m">&lt;</span><span class="l">a</span><span class="l">t</span><span class="l">g</span><span class="">A</span><span class="l h">t</span><span class="l">g</span><span class="m">&gt;</span></div><span style="font-size:14px;color:#475569">passo 29 · q5 · M3: meio achado</span></div><div style="display:flex;align-items:center;gap:12px"><div class="fita"><span class="m">&lt;</span><span class="l">a</span><span class="l">t</span><span class="l">g</span><span class="">A</span><span class="">T</span><span class=" h">G</span><span class="m">&gt;</span></div><span style="font-size:14px;color:#475569">passo 32 · q6 · M13: 2ª metade restaurada</span></div><div style="display:flex;align-items:center;gap:12px"><div class="fita"><span class="m">&lt;</span><span class="x">*</span><span class="l">t</span><span class="l h">g</span><span class="x">*</span><span class="">T</span><span class="">G</span><span class="m">&gt;</span></div><span style="font-size:14px;color:#475569">passo 43 · q6 · M20: 1º par conferido</span></div><div style="display:flex;align-items:center;gap:12px"><div class="fita"><span class="m">&lt;</span><span class="x">*</span><span class="x">*</span><span class="x">*</span><span class="x">*</span><span class="x">*</span><span class="x">*</span><span class="m h">&gt;</span></div><span style="font-size:14px;color:#475569">passo 76 · qac · M18: aceita</span></div><p style="font-size:16px;margin-top:8px"><span class="chip ok">ACEITA</span> em 76 passos</p>
+ </div>
+</div>
+<div class="num">11/17</div><div class="quem">Apresenta: João</div></section><section class="slide ">
+<h1>Fita limitada e garantia de parada</h1>
+<div class="cols">
+ <div class="card"><h2>n células + 2 marcadores fixos</h2>
+  <div class="fita"><span class="m">&lt;</span><span class="">G</span><span class="">A</span><span class="">T</span><span class="">G</span><span class="">A</span><span class="">T</span><span class="m">&gt;</span></div>
+  <ul style="font-size:16.5px">
+   <li>Quem lê <code>&lt;</code> regrava <code>&lt;</code> e só vai para D. Quem lê <code>&gt;</code> regrava <code>&gt;</code> e só vai para E</li>
+   <li>Cabeçote sempre em [0, n+1], verificado na tabela e em todo passo dos testes</li>
+   <li>Memória = reescrita das células (x, *) + estado qX</li></ul></div>
+ <div class="card teal"><h2>Por que sempre termina</h2>
+  <ul style="font-size:16.5px">
+   <li><b>AP:</b> sem ε, cada passo consome 1 símbolo ⇒ ≤ n passos</li>
+   <li><b>ALL:</b> cada ciclo marca 2 células (fase 1) ou confere 2 (fase 3) ⇒ ≤ n/2 ciclos de O(n)</li>
+   <li>Total O(n²). Aceitas: exatamente <b>(5n² + 18n + 16)/4</b> passos</li>
+   <li>Salvaguarda: configurações finitas, |Q|·(n+2)·|Γ|ⁿ</li></ul></div>
+</div>
+<div class="num">12/17</div><div class="quem">Apresenta: João</div></section><section class="slide ">
+<h1>Rastreamentos: como as operações levam à decisão</h1>
+<div class="cols">
+ <div><h2>AP, cenário 2: <span class="nok">rejeita</span></h2>
+  <table class="mono"><tr><th>Passo</th><th>Estado</th><th>Pos</th><th>Pilha</th><th>Regra</th></tr><tr><td>9</td><td>q7</td><td>10</td><td>CCTAGZ</td><td>T9</td></tr><tr><td>10</td><td>q8</td><td>11</td><td>CTAGZ</td><td>T10</td></tr><tr><td>11</td><td>q8</td><td>12</td><td>TAGZ</td><td>T11</td></tr><tr><td>12</td><td>q8</td><td>13</td><td>AGZ</td><td>T11</td></tr><tr><td>13</td><td>q8</td><td>14</td><td>GZ</td><td>T11</td></tr></table>
+  <p style="font-size:16px">Na posição 14 é lido <b>G</b> com <b>G</b> no topo. Esperava-se C, e não há transição: <b>rejeita</b>. O ALL nem executa.</p></div>
+ <div><h2>ALL, cenário 3: <span class="nok">rejeita</span></h2>
+  <table class="mono"><tr><th>Passo</th><th>Estado</th><th>Cab</th><th>Fita</th></tr><tr><td>179</td><td>q7</td><td>1</td><td>&lt;[*]***ca****CT&gt;</td></tr><tr><td>184</td><td>qC</td><td>6</td><td>&lt;*****[a]****CT&gt;</td></tr><tr><td>190</td><td>q6</td><td>10</td><td>&lt;*****a***[*]*T&gt;</td></tr><tr><td>201</td><td>q7</td><td>1</td><td>&lt;[*]****a*****T&gt;</td></tr><tr><td>207</td><td>qA</td><td>7</td><td>&lt;******[*]****T&gt;</td></tr><tr><td>213</td><td>qrj</td><td>12</td><td>&lt;***********[T]&gt;</td></tr></table>
+  <p style="font-size:16px">qA carrega a 6ª base da 1ª cópia (A) e encontra <b>T</b> na célula 12: regra M21, <b>rejeita</b>
+  após 213 passos.</p></div>
+</div>
+<div class="num">13/17</div><div class="quem">Apresenta: Yuri (AP) e João (ALL)</div></section><section class="slide ">
+<h1>Demonstração ao vivo</h1>
+<div class="cols c64">
+ <div>
+  <pre style="font-size:17px;background:#0b2545;color:#e2e8f0;padding:18px;border-radius:12px">python -m validador_dna demo --resumido
+python -m validador_dna gui
+
+python -m validador_dna validar "GATCCgaaaGGATC#ATGGCAATGGCA" --rastro
+python -m validador_dna validar "GATCCgaaaGGATG#ATGGCAATGGCA" --rastro
+python -m validador_dna validar "GATCCgaaaGGATC#ATGGCAATGGCT" --rastro
+python -m validador_dna derivar "GGACgaaGTCC#ATGATG"</pre>
+ </div>
+ <div class="card" style="font-size:17px">
+  <p><span class="chip ok">1</span> AP e ALL aceitam</p>
+  <p><span class="chip nok">2</span> AP rejeita: G × topo G</p>
+  <p><span class="chip nok">3</span> AP aceita, ALL rejeita: T ≠ A</p>
+  <p><span class="chip cinza">+</span> <code>…ATGGCNATGGCA</code> ⇒ <b>ERRO</b>: “o símbolo 'N' na posição 21 não pertence ao alfabeto de entrada…”</p>
+ </div>
+</div>
+<div class="num">14/17</div><div class="quem">Apresenta: Pedro (executa)</div></section><section class="slide ">
+<h1>Testes: 53/53 decisões conferem</h1>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin:10px 0 26px">
+ <div class="card"><div class="grande">24</div><div class="lbl">casos do AP: 10 aceitas, 14 rejeitadas</div></div>
+ <div class="card"><div class="grande">22</div><div class="lbl">casos do ALL: 10 aceitas, 12 rejeitadas</div></div>
+ <div class="card"><div class="grande">3 + 4</div><div class="lbl">cenários de integração + entradas fora do alfabeto</div></div>
+ <div class="card"><div class="grande">120</div><div class="lbl">testes pytest passando</div></div>
+</div>
+<div class="cols">
+ <ul style="font-size:17px">
+  <li>Casos-limite: menor aceita (18 símbolos), vazia, 17 símbolos, <code>AA</code>, <code>A</code></li>
+  <li>Cada registro tem entrada, esperado, obtido e regra verificada (<code>docs/resultados_testes.md</code>)</li></ul>
+ <ul style="font-size:17px">
+  <li>ALL exaustivo: todas as <b>5461</b> cadeias com até 6 símbolos</li>
+  <li>GLC → AP: 1000 cadeias geradas; AP × definição: 3000 mutadas</li></ul>
+</div>
+<div class="num">15/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
+<h1>O que os testes mostraram e as limitações</h1>
+<div class="cols">
+ <div class="card teal"><h2>Observações</h2><ul style="font-size:17px">
+  <li><code>…#ATGATGAT</code> passa no AP (par ≥ 6) mas não é cópia: só o ALL pega</li>
+  <li><code>ACGTACGTAC·CATGCATGCA</code> (uuᴿ) seria aceito por uma pilha; o ALL rejeita</li>
+  <li>Cenários 2 e 3 diferem do 1 em um único símbolo, e cada erro é pego pelo módulo certo</li></ul></div>
+ <div class="card rosa"><h2>Limitações</h2><ul style="font-size:17px">
+  <li><b>Custo quadrático do ALL</b>: 238 passos (n = 12), 832 (n = 24), daí o modo <code>--resumido</code></li>
+  <li>Determinismo depende da alça em minúsculas</li>
+  <li>Só pares perfeitos A–T/C–G; cópia exata e só 2 cópias</li>
+  <li>Estados de contagem (mínimos) alongam o AP</li></ul></div>
+</div>
+<div class="num">16/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
+<h1>Equipe, contribuições e uso de IA</h1>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+ <div class="card"><h2>Yuri Aguiar</h2><p style="font-size:16.5px">Problema, L₁, GLC, derivação, AP e relação GLC ↔ AP</p></div>
+ <div class="card"><h2>João Rath</h2><p style="font-size:16.5px">L₂, prova não-LLC, ALL em 3 fases, parada e limite da fita, diagramas</p></div>
+ <div class="card"><h2>Pedro Paulo</h2><p style="font-size:16.5px">Integração, interfaces CLI/GUI, testes e documentação</p></div>
+</div>
+<div class="card" style="margin-top:24px;font-size:16.5px">
+<p style="margin:0 0 6px"><b>Uso de IA:</b> Claude (Anthropic), via Claude Code, como apoio na sugestão do domínio e no rascunho de código, testes, relatório e slides.</p>
+<p style="margin:0"><b>A equipe verificou:</b> simulação à mão dos 3 cenários, tabelas × diagramas, provas × referências, execução de toda a suíte de testes.</p></div>
+<p style="font-size:16px;color:#475569;margin-top:18px">Referências: Hopcroft, Motwani e Ullman (2006); Sipser (2007); Menezes (2011); Kuroda (1964); Searls (1992; 2002); Aho et al. (2008).</p>
+<div class="num">17/17</div><div class="quem">Apresenta: Todos</div></section>
+<script>
+const s = new URLSearchParams(location.search).get('s');
+if (s) document.querySelectorAll('.slide').forEach((el, i) => { if (i + 1 != s) el.style.display = 'none'; });
+</script></body></html>

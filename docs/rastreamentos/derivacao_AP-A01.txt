@@ -1,0 +1,20 @@
+Derivação mais à esquerda de 'GGACgaaGTCC#ATGATG' na GLC
+#  | Produção             | Forma sentencial
+---+----------------------+-------------------
+0  |                      | S
+1  | P1: S → H # R        | H#R
+2  | P8: H → G I C        | GIC#R
+3  | P12: I → G J C       | GGJCC#R
+4  | P14: J → A K T       | GGAKTCC#R
+5  | P19: K → C L G       | GGACLGTCC#R
+6  | P23: L → N N N       | GGACNNNGTCC#R
+7  | P26: N → g           | GGACgNNGTCC#R
+8  | P24: N → a           | GGACgaNGTCC#R
+9  | P24: N → a           | GGACgaaGTCC#R
+10 | P29: R → B B B B B B | GGACgaaGTCC#BBBBBB
+11 | P30: B → A           | GGACgaaGTCC#ABBBBB
+12 | P33: B → T           | GGACgaaGTCC#ATBBBB
+13 | P32: B → G           | GGACgaaGTCC#ATGBBB
+14 | P30: B → A           | GGACgaaGTCC#ATGABB
+15 | P33: B → T           | GGACgaaGTCC#ATGATB
+16 | P32: B → G           | GGACgaaGTCC#ATGATG

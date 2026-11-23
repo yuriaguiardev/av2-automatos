@@ -1,0 +1,30 @@
+[
+  {
+    "id": "ERR-1",
+    "modulo": "validar",
+    "entrada": "GATCCgaaaGGATC#ATGGCNATGGCA",
+    "esperado": "ERRO",
+    "regra": "'N' (base indeterminada IUPAC) fora de Σ do validador"
+  },
+  {
+    "id": "ERR-2",
+    "modulo": "ap",
+    "entrada": "GGACgaaGUCC#ATGATG",
+    "esperado": "ERRO",
+    "regra": "'U' (uracila, RNA) fora de Σ do AP"
+  },
+  {
+    "id": "ERR-3",
+    "modulo": "all",
+    "entrada": "CAGCAGCAGcagCAGCAG",
+    "esperado": "ERRO",
+    "regra": "Minúsculas fora de Σ do ALL (são símbolos só de fita)"
+  },
+  {
+    "id": "ERR-4",
+    "modulo": "validar",
+    "entrada": "GGACgaaGTCC #ATGATG",
+    "esperado": "ERRO",
+    "regra": "Espaço interno fora de Σ"
+  }
+]
