@@ -134,7 +134,7 @@ def montar() -> str:
 </div>
 <div style="position:absolute;right:72px;top:70px;font-family:Consolas,monospace;font-size:26px;color:#7dd3c8;text-align:right;line-height:1.5">
 GATCC<span style="color:#fbbf24">gaaa</span>GGATC<br><span style="color:#94a3b8">#</span>ATGGCA·ATGGCA</div>
-""", "Pedro", "escuro")
+""", "Yuri", "escuro")
 
     # 2 - problema
     add(f"""
@@ -159,7 +159,7 @@ GATCC<span style="color:#fbbf24">gaaa</span>GGATC<br><span style="color:#94a3b8"
 </div>
 <p style="margin-top:22px">Menor construto válido: <code>GGACgaaGTCC#ATGATG</code>, com <b>18 símbolos</b>.
 Base do domínio: Searls (1992), <i>The Linguistics of DNA</i>.</p>
-""", "Pedro")
+""", "Yuri")
 
     # 3 - arquitetura
     add(f"""
@@ -179,7 +179,7 @@ Base do domínio: Searls (1992), <i>The Linguistics of DNA</i>.</p>
 </table>
 <p style="margin-top:20px"><b>Divisão de trabalho:</b> o AP verifica tudo o que é livre de contexto (hastes, alça, um único #, região par ≥ 6).
 O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª</b>.</p>
-""", "Pedro")
+""", "Yuri")
 
     # 4 - L1 e GLC
     prod = "\n".join(GLC.producoes_agrupadas())
@@ -196,7 +196,7 @@ O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª<
   <li>L → NL | NNN: alça ≥ 3</li>
   <li>R → BBR | B⁶: região par ≥ 6</li></ul></div>
 </div>
-""", "Yuri")
+""", "Pedro")
 
     # 5 - derivacao
     der = GLC.derivacao_mais_a_esquerda("GGACgaaGTCC#ATGATG")
@@ -211,7 +211,7 @@ O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª<
  <div class="card teal" style="margin-top:18px"><p style="font-size:17px;margin:0">Pares gerados de fora para dentro:
  G…C, G…C, A…T, C…G. A haste 3' (GTCC) sai automaticamente como o complemento reverso de GGAC.</p></div></div>
 </div>
-""", "Yuri")
+""", "Pedro")
 
     # 6 - AP diagrama
     add(f"""
@@ -223,7 +223,7 @@ O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª<
  <p style="font-size:17px;margin:0"><b>Determinístico, sem ε</b>: a minúscula marca o fim da haste 5', então não é preciso adivinhar o meio.
  20 regras esquemáticas geram {len(AP.TRANSICOES)} transições concretas.</p>
 </div>
-""", "Yuri")
+""", "Pedro")
 
     # 7 - como a pilha decide
     add(f"""
@@ -251,7 +251,7 @@ O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª<
   <p style="font-size:17px">A última base empilhada (C) é a primeira a ser casada (G): <b>LIFO = aninhamento</b>.</p>
  </div>
 </div>
-""", "Yuri")
+""", "Pedro")
 
     # 8 - GLC <-> AP e nao regular
     add("""
@@ -268,7 +268,7 @@ O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª<
  <p style="font-size:17px">xy²z = A<sup>p+i</sup> aaa T<sup>p</sup> #AAAAAA ∉ L₁, pois a haste 3' fica curta.</p>
  <p style="font-size:17px">Um AFD precisaria lembrar uma haste de tamanho <b>ilimitado</b>. A pilha dá essa memória.</p></div>
 </div>
-""", "Yuri")
+""", "Pedro")
 
     # 9 - dependencia sensivel ao contexto
     add(f"""
@@ -358,7 +358,7 @@ O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª<
   <p style="font-size:16px">qA carrega a 6ª base da 1ª cópia (A) e encontra <b>T</b> na célula 12: regra M21, <b>rejeita</b>
   após {len(r3.passos) - 1} passos.</p></div>
 </div>
-""", "Yuri (AP) e João (ALL)")
+""", "Pedro (AP) e João (ALL)")
 
     # 14 - demo
     add(f"""
@@ -380,7 +380,7 @@ python -m validador_dna derivar "GGACgaaGTCC#ATGATG"</pre>
   <p><span class="chip cinza">+</span> <code>…ATGGCNATGGCA</code> ⇒ <b>ERRO</b>: “o símbolo 'N' na posição 21 não pertence ao alfabeto de entrada…”</p>
  </div>
 </div>
-""", "Pedro (executa)")
+""", "Yuri (executa); Pedro e João comentam")
 
     # 15 - testes
     n_ap = len(grupos["ap"]); n_all = len(grupos["all"])
@@ -400,7 +400,7 @@ python -m validador_dna derivar "GGACgaaGTCC#ATGATG"</pre>
   <li>ALL exaustivo: todas as <b>5461</b> cadeias com até 6 símbolos</li>
   <li>GLC → AP: 1000 cadeias geradas; AP × definição: 3000 mutadas</li></ul>
 </div>
-""", "Pedro")
+""", "Yuri")
 
     # 16 - limitacoes
     add("""
@@ -416,21 +416,21 @@ python -m validador_dna derivar "GGACgaaGTCC#ATGATG"</pre>
   <li>Só pares perfeitos A–T/C–G; cópia exata e só 2 cópias</li>
   <li>Estados de contagem (mínimos) alongam o AP</li></ul></div>
 </div>
-""", "Pedro")
+""", "Yuri")
 
     # 17 - equipe e IA
     add("""
 <h1>Equipe, contribuições e uso de IA</h1>
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
- <div class="card"><h2>Yuri Aguiar</h2><p style="font-size:16.5px">Problema, L₁, GLC, derivação, AP e relação GLC ↔ AP</p></div>
+ <div class="card"><h2>Yuri Aguiar</h2><p style="font-size:16.5px">Problema, arquitetura e integração AP → ALL, validação do alfabeto, interfaces CLI/GUI, testes e documentação</p></div>
+ <div class="card"><h2>Pedro Paulo</h2><p style="font-size:16.5px">L₁, GLC, derivação, AP, relação GLC ↔ AP e prova de não regularidade</p></div>
  <div class="card"><h2>João Rath</h2><p style="font-size:16.5px">L₂, prova não-LLC, ALL em 3 fases, parada e limite da fita, diagramas</p></div>
- <div class="card"><h2>Pedro Paulo</h2><p style="font-size:16.5px">Integração, interfaces CLI/GUI, testes e documentação</p></div>
 </div>
 <div class="card" style="margin-top:24px;font-size:16.5px">
 <p style="margin:0 0 6px"><b>Uso de IA:</b> Claude (Anthropic), via Claude Code, como apoio na sugestão do domínio e no rascunho de código, testes, relatório e slides.</p>
 <p style="margin:0"><b>A equipe verificou:</b> simulação à mão dos 3 cenários, tabelas × diagramas, provas × referências, execução de toda a suíte de testes.</p></div>
 <p style="font-size:16px;color:#475569;margin-top:18px">Referências: Hopcroft, Motwani e Ullman (2006); Sipser (2007); Menezes (2011); Kuroda (1964); Searls (1992; 2002); Aho et al. (2008).</p>
-""", "Todos")
+""", "Yuri")
 
     partes = []
     for i, (classe, conteudo, quem) in enumerate(slides, start=1):

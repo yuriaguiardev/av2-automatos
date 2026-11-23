@@ -8,3 +8,6 @@ venv/
 
 # material interno de estudo (nao entregar)
 docs/guia_arguicao.md
+docs/guia_arguicao.pdf
+docs/guia_arguicao.html
+docs/gerar_guia_pdf.py

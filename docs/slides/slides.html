@@ -56,7 +56,7 @@ table.mono td { font-family: Consolas, monospace; font-size: 14px; }
 </div>
 <div style="position:absolute;right:72px;top:70px;font-family:Consolas,monospace;font-size:26px;color:#7dd3c8;text-align:right;line-height:1.5">
 GATCC<span style="color:#fbbf24">gaaa</span>GGATC<br><span style="color:#94a3b8">#</span>ATGGCA·ATGGCA</div>
-<div class="num">1/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
+<div class="num">1/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
 <h1>O problema: validar um construto antes da síntese</h1>
 <div class="cols">
  <div class="card teal">
@@ -78,7 +78,7 @@ GATCC<span style="color:#fbbf24">gaaa</span>GGATC<br><span style="color:#94a3b8"
 </div>
 <p style="margin-top:22px">Menor construto válido: <code>GGACgaaGTCC#ATGATG</code>, com <b>18 símbolos</b>.
 Base do domínio: Searls (1992), <i>The Linguistics of DNA</i>.</p>
-<div class="num">2/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
+<div class="num">2/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
 <h1>Arquitetura: duas etapas, dois níveis de Chomsky</h1>
 <div class="fluxo">
  <div class="caixa">Entrada<small>Σ = {A,C,G,T,a,c,g,t,#}</small></div><div class="seta">→</div>
@@ -95,7 +95,7 @@ Base do domínio: Searls (1992), <i>The Linguistics of DNA</i>.</p>
 </table>
 <p style="margin-top:20px"><b>Divisão de trabalho:</b> o AP verifica tudo o que é livre de contexto (hastes, alça, um único #, região par ≥ 6).
 O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª</b>.</p>
-<div class="num">3/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
+<div class="num">3/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
 <h1>L₁ e a gramática livre de contexto</h1>
 <div class="def">L₁ = { w · x · cr(w) # y &nbsp;|&nbsp; w ∈ {A,C,G,T}<sup>k</sup>, k ≥ 4; &nbsp;x ∈ {a,c,g,t}<sup>m</sup>, m ≥ 3; &nbsp;y ∈ {A,C,G,T}<sup>2j</sup>, j ≥ 3 }
 <br><span style="font-size:16px;color:#475569">cr(w) = complemento reverso de w</span></div>
@@ -116,7 +116,7 @@ B → A | C | G | T</pre></div>
   <li>L → NL | NNN: alça ≥ 3</li>
   <li>R → BBR | B⁶: região par ≥ 6</li></ul></div>
 </div>
-<div class="num">4/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
+<div class="num">4/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
 <h1>Derivação mais à esquerda de <code style="font-size:34px">GGACgaaGTCC#ATGATG</code></h1>
 <div class="cols">
  <table class="mono"><tr><th>#</th><th>Produção</th><th>Forma sentencial</th></tr><tr><td>0</td><td></td><td><code>S</code></td></tr><tr><td>1</td><td>S → H # R</td><td><code>H#R</code></td></tr><tr><td>2</td><td>H → G I C</td><td><code>GIC#R</code></td></tr><tr><td>3</td><td>I → G J C</td><td><code>GGJCC#R</code></td></tr><tr><td>4</td><td>J → A K T</td><td><code>GGAKTCC#R</code></td></tr><tr><td>5</td><td>K → C L G</td><td><code>GGACLGTCC#R</code></td></tr><tr><td>6</td><td>L → N N N</td><td><code>GGACNNNGTCC#R</code></td></tr><tr><td>7</td><td>N → g</td><td><code>GGACgNNGTCC#R</code></td></tr><tr><td>8</td><td>N → a</td><td><code>GGACgaNGTCC#R</code></td></tr><tr><td>9</td><td>N → a</td><td><code>GGACgaaGTCC#R</code></td></tr></table>
@@ -124,7 +124,7 @@ B → A | C | G | T</pre></div>
  <div class="card teal" style="margin-top:18px"><p style="font-size:17px;margin:0">Pares gerados de fora para dentro:
  G…C, G…C, A…T, C…G. A haste 3' (GTCC) sai automaticamente como o complemento reverso de GGAC.</p></div></div>
 </div>
-<div class="num">5/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
+<div class="num">5/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
 <h1>Autômato de Pilha M = (Q, Σ, Γ, δ, q0, Z, F)</h1>
 <div class="fig" style="margin-top:-6px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 470" width="1150" height="470">
   <defs><marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -243,7 +243,7 @@ B → A | C | G | T</pre></div>
  <p style="font-size:17px;margin:0"><b>Determinístico, sem ε</b>: a minúscula marca o fim da haste 5', então não é preciso adivinhar o meio.
  20 regras esquemáticas geram 173 transições concretas.</p>
 </div>
-<div class="num">6/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
+<div class="num">6/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
 <h1>Como a pilha decide</h1>
 <div class="cols c46">
  <div class="card">
@@ -268,7 +268,7 @@ B → A | C | G | T</pre></div>
   <p style="font-size:17px">A última base empilhada (C) é a primeira a ser casada (G): <b>LIFO = aninhamento</b>.</p>
  </div>
 </div>
-<div class="num">7/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
+<div class="num">7/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
 <h1>Por que L(AP) = L(G) e por que L₁ não é regular</h1>
 <div class="cols">
  <div class="card teal"><h2>GLC ↔ AP</h2><ul style="font-size:17px">
@@ -282,7 +282,7 @@ B → A | C | G | T</pre></div>
  <p style="font-size:17px">xy²z = A<sup>p+i</sup> aaa T<sup>p</sup> #AAAAAA ∉ L₁, pois a haste 3' fica curta.</p>
  <p style="font-size:17px">Um AFD precisaria lembrar uma haste de tamanho <b>ilimitado</b>. A pilha dá essa memória.</p></div>
 </div>
-<div class="num">8/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
+<div class="num">8/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
 <h1>A dependência que a pilha não consegue verificar</h1>
 <div class="fig" style="max-width:1000px;margin:0 auto 10px"><svg viewBox="0 0 640 125" width="100%" style="max-width:640px"><style>.ft{font:600 12px 'Segoe UI',Arial}.fs{font:15px Consolas,monospace}</style><text x="20" y="18" class="ft">Grampo (L₁): dependências ANINHADAS — pilha (LIFO)</text><text x="20" y="110" class="fs" text-anchor="middle">G</text><text x="46" y="110" class="fs" text-anchor="middle">A</text><text x="72" y="110" class="fs" text-anchor="middle">T</text><text x="98" y="110" class="fs" text-anchor="middle">C</text><text x="124" y="110" class="fs" text-anchor="middle">g</text><text x="150" y="110" class="fs" text-anchor="middle">a</text><text x="176" y="110" class="fs" text-anchor="middle">a</text><text x="202" y="110" class="fs" text-anchor="middle">G</text><text x="228" y="110" class="fs" text-anchor="middle">A</text><text x="254" y="110" class="fs" text-anchor="middle">T</text><text x="280" y="110" class="fs" text-anchor="middle">C</text><path d="M20,94 C20,12 280,12 280,94" fill="none" stroke="#1d4ed8" stroke-width="1.6"/><path d="M46,94 C46,26 254,26 254,94" fill="none" stroke="#1d4ed8" stroke-width="1.6"/><path d="M72,94 C72,40 228,40 228,94" fill="none" stroke="#1d4ed8" stroke-width="1.6"/><path d="M98,94 C98,54 202,54 202,94" fill="none" stroke="#1d4ed8" stroke-width="1.6"/><text x="380" y="18" class="ft">Cópia uu (L₂): dependências CRUZADAS</text><text x="380" y="110" class="fs" text-anchor="middle">A</text><text x="406" y="110" class="fs" text-anchor="middle">T</text><text x="432" y="110" class="fs" text-anchor="middle">G</text><text x="458" y="110" class="fs" text-anchor="middle">C</text><text x="484" y="110" class="fs" text-anchor="middle">A</text><text x="510" y="110" class="fs" text-anchor="middle">T</text><text x="536" y="110" class="fs" text-anchor="middle">G</text><text x="562" y="110" class="fs" text-anchor="middle">C</text><path d="M380,94 C380,54 484,54 484,94" fill="none" stroke="#b91c1c" stroke-width="1.6"/><path d="M406,94 C406,54 510,54 510,94" fill="none" stroke="#b91c1c" stroke-width="1.6"/><path d="M432,94 C432,54 536,54 536,94" fill="none" stroke="#b91c1c" stroke-width="1.6"/><path d="M458,94 C458,54 562,54 562,94" fill="none" stroke="#b91c1c" stroke-width="1.6"/></svg></div>
 <div class="cols">
@@ -437,7 +437,7 @@ B → A | C | G | T</pre></div>
   <p style="font-size:16px">qA carrega a 6ª base da 1ª cópia (A) e encontra <b>T</b> na célula 12: regra M21, <b>rejeita</b>
   após 213 passos.</p></div>
 </div>
-<div class="num">13/17</div><div class="quem">Apresenta: Yuri (AP) e João (ALL)</div></section><section class="slide ">
+<div class="num">13/17</div><div class="quem">Apresenta: Pedro (AP) e João (ALL)</div></section><section class="slide ">
 <h1>Demonstração ao vivo</h1>
 <div class="cols c64">
  <div>
@@ -456,7 +456,7 @@ python -m validador_dna derivar "GGACgaaGTCC#ATGATG"</pre>
   <p><span class="chip cinza">+</span> <code>…ATGGCNATGGCA</code> ⇒ <b>ERRO</b>: “o símbolo 'N' na posição 21 não pertence ao alfabeto de entrada…”</p>
  </div>
 </div>
-<div class="num">14/17</div><div class="quem">Apresenta: Pedro (executa)</div></section><section class="slide ">
+<div class="num">14/17</div><div class="quem">Apresenta: Yuri (executa); Pedro e João comentam</div></section><section class="slide ">
 <h1>Testes: 53/53 decisões conferem</h1>
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin:10px 0 26px">
  <div class="card"><div class="grande">24</div><div class="lbl">casos do AP: 10 aceitas, 14 rejeitadas</div></div>
@@ -472,7 +472,7 @@ python -m validador_dna derivar "GGACgaaGTCC#ATGATG"</pre>
   <li>ALL exaustivo: todas as <b>5461</b> cadeias com até 6 símbolos</li>
   <li>GLC → AP: 1000 cadeias geradas; AP × definição: 3000 mutadas</li></ul>
 </div>
-<div class="num">15/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
+<div class="num">15/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
 <h1>O que os testes mostraram e as limitações</h1>
 <div class="cols">
  <div class="card teal"><h2>Observações</h2><ul style="font-size:17px">
@@ -485,18 +485,18 @@ python -m validador_dna derivar "GGACgaaGTCC#ATGATG"</pre>
   <li>Só pares perfeitos A–T/C–G; cópia exata e só 2 cópias</li>
   <li>Estados de contagem (mínimos) alongam o AP</li></ul></div>
 </div>
-<div class="num">16/17</div><div class="quem">Apresenta: Pedro</div></section><section class="slide ">
+<div class="num">16/17</div><div class="quem">Apresenta: Yuri</div></section><section class="slide ">
 <h1>Equipe, contribuições e uso de IA</h1>
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
- <div class="card"><h2>Yuri Aguiar</h2><p style="font-size:16.5px">Problema, L₁, GLC, derivação, AP e relação GLC ↔ AP</p></div>
+ <div class="card"><h2>Yuri Aguiar</h2><p style="font-size:16.5px">Problema, arquitetura e integração AP → ALL, validação do alfabeto, interfaces CLI/GUI, testes e documentação</p></div>
+ <div class="card"><h2>Pedro Paulo</h2><p style="font-size:16.5px">L₁, GLC, derivação, AP, relação GLC ↔ AP e prova de não regularidade</p></div>
  <div class="card"><h2>João Rath</h2><p style="font-size:16.5px">L₂, prova não-LLC, ALL em 3 fases, parada e limite da fita, diagramas</p></div>
- <div class="card"><h2>Pedro Paulo</h2><p style="font-size:16.5px">Integração, interfaces CLI/GUI, testes e documentação</p></div>
 </div>
 <div class="card" style="margin-top:24px;font-size:16.5px">
 <p style="margin:0 0 6px"><b>Uso de IA:</b> Claude (Anthropic), via Claude Code, como apoio na sugestão do domínio e no rascunho de código, testes, relatório e slides.</p>
 <p style="margin:0"><b>A equipe verificou:</b> simulação à mão dos 3 cenários, tabelas × diagramas, provas × referências, execução de toda a suíte de testes.</p></div>
 <p style="font-size:16px;color:#475569;margin-top:18px">Referências: Hopcroft, Motwani e Ullman (2006); Sipser (2007); Menezes (2011); Kuroda (1964); Searls (1992; 2002); Aho et al. (2008).</p>
-<div class="num">17/17</div><div class="quem">Apresenta: Todos</div></section>
+<div class="num">17/17</div><div class="quem">Apresenta: Yuri</div></section>
 <script>
 const s = new URLSearchParams(location.search).get('s');
 if (s) document.querySelectorAll('.slide').forEach((el, i) => { if (i + 1 != s) el.style.display = 'none'; });

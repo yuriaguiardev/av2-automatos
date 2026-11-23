@@ -484,12 +484,13 @@ regulares. Isso torna o diagrama mais longo, mas deixa cada restrição visível
     contrib = """
 <h2>9. Contribuição de cada integrante</h2>
 <table><thead><tr><th>Integrante</th><th>Contribuição</th><th>Parte apresentada</th></tr></thead><tbody>
-<tr><td>Yuri Aguiar</td><td>Escolha e pesquisa do problema; definição de L₁; GLC e derivação; modelagem e implementação do AP
-(<code>automato_pilha.py</code>, <code>gramatica.py</code>); prova de que L₁ não é regular.</td><td>Problema, GLC, derivação e relação GLC ↔ AP; rastreamento do AP.</td></tr>
+<tr><td>Yuri Aguiar</td><td>Escolha e pesquisa do problema; arquitetura e integração AP → ALL (<code>pipeline.py</code>); validação
+do alfabeto e mensagens de erro; interfaces de linha de comando e gráfica; casos e suíte de testes; README, relatório e slides.</td>
+<td>Abertura, problema, arquitetura, demonstração ao vivo dos três cenários, testes, limitação e encerramento.</td></tr>
+<tr><td>Pedro Paulo</td><td>Definição de L₁; GLC e derivação; modelagem e implementação do AP (<code>automato_pilha.py</code>,
+<code>gramatica.py</code>); prova de que L₁ não é regular; justificativa GLC ↔ AP.</td><td>GLC, derivação, AP e relação GLC ↔ AP; rastreamento do AP.</td></tr>
 <tr><td>João Rath</td><td>Definição de L₂ e prova de que não é LLC; algoritmo de três fases do ALL; prova de parada e do limite da fita;
 implementação de <code>automato_linear.py</code>; diagramas.</td><td>Dependência sensível ao contexto, ALL, limite da fita e rastreamento do ALL.</td></tr>
-<tr><td>Pedro Paulo</td><td>Integração AP → ALL (<code>pipeline.py</code>); interfaces de linha de comando e gráfica; casos e suíte de testes; README,
-relatório e slides.</td><td>Arquitetura, demonstração ao vivo dos três cenários, testes e limitações.</td></tr>
 </tbody></table>
 <p>Todos revisaram a modelagem formal, simularam cadeias à mão e ensaiaram a arguição.</p>
 """
