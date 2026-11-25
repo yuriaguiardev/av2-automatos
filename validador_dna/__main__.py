@@ -9,6 +9,7 @@ Exemplos:
   python -m validador_dna especificacao
   python -m validador_dna interativo
   python -m validador_dna gui
+  python -m validador_dna web
 """
 
 from __future__ import annotations
@@ -169,6 +170,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("especificacao", help="imprime GLC, AP e ALL formalmente")
     sub.add_parser("interativo", help="modo interativo no terminal")
     sub.add_parser("gui", help="interface gráfica (Tkinter)")
+    p = sub.add_parser("web", help="interface web no navegador (http://127.0.0.1:8000)")
+    p.add_argument("--porta", type=int, default=8000)
+    p.add_argument("--sem-navegador", action="store_true", help="não abre o navegador automaticamente")
 
     args = parser.parse_args(argv)
     if args.comando == "validar":
@@ -189,6 +193,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.comando == "gui":
         from .gui import iniciar
         iniciar()
+        return 0
+    if args.comando == "web":
+        from .servidor_web import iniciar as iniciar_web
+        iniciar_web(args.porta, abrir_navegador=not args.sem_navegador)
         return 0
     return 1
 

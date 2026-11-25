@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Validador de DNA — AP + ALL</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --ink: #1d2330; --muted: #5d6676; --line: #e1e5eb; --soft: #eef1f5;
+    --accent: #2f5bd3; --accent-ink: #ffffff;
+    --ok: #1b7f3b; --ok-bg: #e5f4ea; --bad: #b3261e; --bad-bg: #fbe9e7; --warn: #8a5a00; --warn-bg: #fff3d6;
+    --haste: #2f5bd3; --haste-bg: #e6edfc; --alca: #a15c00; --alca-bg: #fff0d9;
+    --regiao: #1b7f3b; --regiao-bg: #e5f4ea; --sep: #5d6676; --sep-bg: #eceff3;
+    --head: #2f5bd3; --done: #c9ced6;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151b; --card: #1b1f27; --ink: #e6e9ef; --muted: #9aa3b2; --line: #2c323d; --soft: #232833;
+      --accent: #7c9cff; --accent-ink: #0f1320;
+      --ok: #5fcf85; --ok-bg: #173323; --bad: #ff8a80; --bad-bg: #3a1c1a; --warn: #ffc65c; --warn-bg: #3a2e12;
+      --haste: #8fb0ff; --haste-bg: #1f2b4a; --alca: #ffbe6b; --alca-bg: #3a2b14;
+      --regiao: #6fd895; --regiao-bg: #17321f; --sep: #b4bccb; --sep-bg: #2a303b;
+      --head: #8fb0ff; --done: #3b424f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 4px 0 0; color: var(--muted); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-top: 16px; }
+  .rotulo { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  code, .mono { font-family: var(--mono); }
+
+  /* entrada */
+  .linha-entrada { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  #cadeia { flex: 1 1 360px; min-width: 0; font: 17px var(--mono); padding: 10px 12px; border-radius: 8px;
+            border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+  #cadeia:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button { font: 600 14px var(--sans); border-radius: 8px; padding: 9px 14px; cursor: pointer;
+           border: 1px solid var(--line); background: var(--soft); color: var(--ink); }
+  button:hover { border-color: var(--accent); }
+  button.primario { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  select { font: 13px var(--sans); padding: 4px 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--soft); color: var(--ink); }
+  button:disabled { opacity: .45; cursor: default; }
+  .exemplos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .exemplos button { font-weight: 500; font-size: 13px; padding: 5px 10px; }
+
+  .segmentos { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 14px; font: 16px var(--mono); }
+  .seg { display: flex; flex-direction: column; align-items: center; }
+  .seg .bases { padding: 3px 6px; border-radius: 6px; letter-spacing: .08em; }
+  .seg .nome { font: 11px var(--sans); color: var(--muted); margin-top: 2px; white-space: nowrap; }
+  .t-haste { color: var(--haste); background: var(--haste-bg); }
+  .t-alca { color: var(--alca); background: var(--alca-bg); }
+  .t-sep { color: var(--sep); background: var(--sep-bg); }
+  .t-regiao { color: var(--regiao); background: var(--regiao-bg); }
+  .t-invalido { color: var(--bad); background: var(--bad-bg); text-decoration: underline wavy; }
+  .legenda-dica { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+  /* resultado */
+  .etapas { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch; }
+  .seta { align-self: center; color: var(--muted); font-size: 22px; }
+  .etapa { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--bg); }
+  .etapa h3 { margin: 0 0 6px; font-size: 15px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  .etapa p { margin: 0; color: var(--muted); font-size: 14px; }
+  .selo { font: 700 12px var(--sans); padding: 3px 9px; border-radius: 99px; white-space: nowrap; }
+  .selo.ok { color: var(--ok); background: var(--ok-bg); }
+  .selo.bad { color: var(--bad); background: var(--bad-bg); }
+  .selo.neutro { color: var(--muted); background: var(--soft); }
+  .final { margin-top: 14px; padding: 12px 16px; border-radius: 10px; font-weight: 700; font-size: 18px; }
+  .final.ok { color: var(--ok); background: var(--ok-bg); }
+  .final.bad { color: var(--bad); background: var(--bad-bg); }
+  .final.warn { color: var(--warn); background: var(--warn-bg); }
+  .final small { display: block; font-weight: 400; font-size: 14px; margin-top: 2px; }
+
+  /* abas */
+  .abas { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-top: 24px; overflow-x: auto; }
+  .abas button { border: none; background: none; border-bottom: 2px solid transparent; border-radius: 0; padding: 10px 14px; color: var(--muted); white-space: nowrap; }
+  .abas button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+  .painel { display: none; }
+  .painel.ativo { display: block; }
+  .painel > .card { margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0; border-top: none; }
+  .vazio { color: var(--muted); padding: 24px 0; text-align: center; }
+
+  /* simulador */
+  .controles { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .controles button { padding: 6px 11px; min-width: 40px; }
+  .controles input[type=range] { flex: 1 1 200px; accent-color: var(--accent); }
+  .controles label { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+  .contador { font: 13px var(--mono); color: var(--muted); min-width: 110px; text-align: right; }
+  .estado-atual { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0 10px; align-items: baseline; }
+  .estado-atual .q { font: 700 22px var(--mono); }
+  .estado-atual .delta { font: 14px var(--mono); color: var(--muted); }
+  .visual { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
+  .fita-wrap { flex: 1 1 520px; min-width: 0; overflow-x: auto; padding-bottom: 6px; }
+  .fita { display: flex; gap: 3px; padding: 18px 2px 20px; }
+  .celula { position: relative; flex: 0 0 auto; width: 30px; height: 36px; display: grid; place-items: center;
+            border: 1px solid var(--line); border-radius: 6px; font: 600 16px var(--mono); background: var(--card); }
+  .celula .idx { position: absolute; bottom: -16px; font: 10px var(--mono); color: var(--muted); }
+  .celula.lida { color: var(--muted); background: var(--soft); }
+  .celula.cabecote { border: 2px solid var(--head); box-shadow: 0 0 0 3px color-mix(in srgb, var(--head) 25%, transparent); }
+  .celula.cabecote::before { content: "▼"; position: absolute; top: -18px; font-size: 11px; color: var(--head); }
+  .celula.cabecote.bloqueio { border-color: var(--bad); color: var(--bad); background: var(--bad-bg); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bad) 25%, transparent); }
+  .celula.cabecote.bloqueio::before { color: var(--bad); }
+  .celula.marca { color: var(--muted); background: var(--soft); }
+  .celula.conferida { color: var(--ok); background: var(--ok-bg); }
+  .celula.minuscula { color: var(--alca); background: var(--alca-bg); }
+  .celula.fim { width: 38px; font-size: 12px; color: var(--muted); border-style: dashed; }
+  .pilha-wrap { flex: 0 0 auto; }
+  .pilha { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; min-height: 40px; }
+  .pilha .celula { width: 44px; }
+  .pilha .celula.topo { border: 2px solid var(--head); }
+  .pilha .celula.fundo { color: var(--muted); background: var(--soft); }
+  .legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 18px; }
+  .legenda span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; background: var(--c); }
+
+  .tabela-wrap { max-height: 380px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; margin-top: 16px; }
+  table { border-collapse: collapse; width: 100%; font: 13px var(--mono); }
+  th, td { padding: 5px 10px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--line); }
+  th { position: sticky; top: 0; background: var(--soft); font: 600 12px var(--sans); color: var(--muted); }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: var(--soft); }
+  tbody tr.atual { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+  .motivo { margin-top: 14px; padding: 10px 14px; border-radius: 8px; font-size: 14px; }
+  .motivo.ok { color: var(--ok); background: var(--ok-bg); }
+  .motivo.bad { color: var(--bad); background: var(--bad-bg); }
+  pre { font: 13px/1.45 var(--mono); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px; overflow-x: auto; margin: 0 0 14px; }
+  .erro-msg { color: var(--bad); }
+
+  @media (max-width: 720px) {
+    .etapas { grid-template-columns: 1fr; }
+    .seta { transform: rotate(90deg); justify-self: center; }
+    .contador { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Validador de construtos de DNA</h1>
+    <p>Autômato de Pilha (grampo, complemento reverso) → Autômato Linearmente Limitado (repetição em tandem <code>uu</code>)</p>
+  </header>
+
+  <section class="card">
+    <div class="rotulo">Cadeia de entrada — <span class="mono">haste5' · alça · haste3' # região</span></div>
+    <div class="linha-entrada">
+      <input id="cadeia" spellcheck="false" autocomplete="off" value="GATCCgaaaGGATC#ATGGCAATGGCA" aria-label="Cadeia de entrada">
+      <button class="primario" data-modo="completo">Validar (AP → ALL)</button>
+      <button data-modo="ap">Só AP</button>
+      <button data-modo="all">Só ALL</button>
+      <button id="btn-derivar">Derivação</button>
+    </div>
+    <div id="segmentos" class="segmentos"></div>
+    <div class="legenda-dica">Bases pareadas em maiúsculas (A, C, G, T), alça em minúsculas (a, c, g, t), um único <code>#</code>. Enter valida.</div>
+    <div id="exemplos" class="exemplos"></div>
+  </section>
+
+  <section class="card" id="resultado" hidden></section>
+
+  <nav class="abas" role="tablist">
+    <button role="tab" data-aba="ap" aria-selected="true">Simulação do AP</button>
+    <button role="tab" data-aba="all" aria-selected="false">Simulação do ALL</button>
+    <button role="tab" data-aba="der" aria-selected="false">Derivação (GLC)</button>
+    <button role="tab" data-aba="esp" aria-selected="false">Especificação formal</button>
+  </nav>
+  <section class="painel ativo" id="painel-ap"><div class="card"><div class="vazio">Valide uma cadeia para ver o autômato de pilha passo a passo.</div></div></section>
+  <section class="painel" id="painel-all"><div class="card"><div class="vazio">O ALL roda quando o AP aceita (ou use “Só ALL”).</div></div></section>
+  <section class="painel" id="painel-der"><div class="card"><div class="vazio">Clique em “Derivação” para ver a derivação mais à esquerda na GLC.</div></div></section>
+  <section class="painel" id="painel-esp"><div class="card"><div class="vazio">Carregando…</div></div></section>
+</main>
+
+<script>
+"use strict";
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const entrada = $("#cadeia");
+
+async function api(caminho, corpo) {
+  const r = await fetch(caminho, corpo === undefined ? {} : {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo),
+  });
+  return r.json();
+}
+
+/* ---------------------------------------------------------------- abas */
+function abrirAba(nome) {
+  document.querySelectorAll(".abas button").forEach(b => b.setAttribute("aria-selected", b.dataset.aba === nome));
+  document.querySelectorAll(".painel").forEach(p => p.classList.toggle("ativo", p.id === "painel-" + nome));
+}
+document.querySelectorAll(".abas button").forEach(b => b.addEventListener("click", () => abrirAba(b.dataset.aba)));
+
+/* ------------------------------------------------- pré-visualização da cadeia */
+const VALIDOS = new Set("ACGTacgt#");
+function segmentar(s) {
+  const partes = [];
+  const i = s.indexOf("#");
+  const grampo = i < 0 ? s : s.slice(0, i);
+  const m = grampo.match(/^([^a-z]*)([a-z]*)(.*)$/s);
+  if (m[1]) partes.push(["haste", m[1], "haste 5′ (" + m[1].length + ")"]);
+  if (m[2]) partes.push(["alca", m[2], "alça (" + m[2].length + ")"]);
+  if (m[3]) partes.push(["haste", m[3], "haste 3′ (" + m[3].length + ")"]);
+  if (i >= 0) {
+    partes.push(["sep", "#", "separador"]);
+    const r = s.slice(i + 1);
+    if (r) partes.push(["regiao", r, "região (" + r.length + ")"]);
+  }
+  return partes;
+}
+function desenharSegmentos() {
+  const s = entrada.value.trim();
+  $("#segmentos").innerHTML = segmentar(s).map(([tipo, txt, nome]) => {
+    const bases = [...txt].map(c => VALIDOS.has(c) ? esc(c) : `<span class="t-invalido" title="fora do alfabeto">${esc(c)}</span>`).join("");
+    return `<div class="seg"><span class="bases t-${tipo}">${bases}</span><span class="nome">${nome}</span></div>`;
+  }).join("");
+}
+entrada.addEventListener("input", desenharSegmentos);
+entrada.addEventListener("keydown", e => { if (e.key === "Enter") executar("completo"); });
+
+/* ------------------------------------------------------------- simulador */
+class Simulador {
+  constructor(painel, cfg) {
+    this.painel = painel; this.cfg = cfg; this.res = null; this.i = 0; this.timer = null; this.resumido = cfg.resumivel;
+  }
+  carregar(res, titulo) {
+    this.parar(); this.res = res; this.titulo = titulo;
+    this.montar(); this.filtrar(); this.ir(0);
+  }
+  limpar(msg) { this.parar(); this.res = null; this.painel.innerHTML = `<div class="card"><div class="vazio">${esc(msg)}</div></div>`; }
+  filtrar() {
+    const p = this.res.passos;
+    this.visiveis = !this.resumido ? p.map((_, k) => k)
+      : p.map((_, k) => k).filter(k => k === 0 || k === p.length - 1 || p[k].estado !== p[k - 1].estado || p[k].fita !== p[k - 1].fita);
+    const corpo = this.painel.querySelector("tbody");
+    corpo.innerHTML = this.visiveis.map((k, v) => `<tr data-v="${v}">${this.cfg.linha(p[k], this.res).map(c => `<td>${c}</td>`).join("")}</tr>`).join("");
+    const r = this.painel.querySelector("input[type=range]");
+    r.max = this.visiveis.length - 1;
+    const oc = p.length - this.visiveis.length;
+    this.painel.querySelector(".ocultos").textContent = oc ? `${oc} passos de simples deslocamento ocultos` : "";
+  }
+  montar() {
+    const res = this.res, ok = res.aceita;
+    this.painel.innerHTML = `<div class="card">
+      <div class="rotulo">${esc(this.titulo)}</div>
+      <div class="controles" style="margin-top:10px">
+        <button data-a="ini" title="Início">⏮</button>
+        <button data-a="ant" title="Passo anterior (←)">◀</button>
+        <button data-a="play" class="primario" title="Reproduzir (espaço)">▶</button>
+        <button data-a="prox" title="Próximo passo (→)">▶︎|</button>
+        <button data-a="fim" title="Fim">⏭</button>
+        <input type="range" min="0" value="0" aria-label="Passo">
+        <span class="contador"></span>
+        <label>Velocidade <select data-a="vel"><option value="900">lenta</option><option value="450" selected>normal</option><option value="150">rápida</option><option value="40">turbo</option></select></label>
+        ${this.cfg.resumivel ? `<label><input type="checkbox" data-a="res" ${this.resumido ? "checked" : ""}> resumido</label>` : ""}
+      </div>
+      <div class="estado-atual"><span class="q"></span><span class="delta"></span></div>
+      <div class="visual">${this.cfg.esqueleto}</div>
+      <div class="legenda">${this.cfg.legenda}</div>
+      <div class="motivo ${ok ? "ok" : "bad"}"><strong>${esc(res.decisao)}</strong> — ${esc(res.motivo)}</div>
+      <div class="tabela-wrap"><table><thead><tr>${this.cfg.colunas.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody></tbody></table></div>
+      <div class="legenda ocultos"></div>
+    </div>`;
+    const P = this.painel;
+    P.querySelector('[data-a=ini]').onclick = () => { this.parar(); this.ir(0); };
+    P.querySelector('[data-a=ant]').onclick = () => { this.parar(); this.ir(this.v - 1); };
+    P.querySelector('[data-a=prox]').onclick = () => { this.parar(); this.ir(this.v + 1); };
+    P.querySelector('[data-a=fim]').onclick = () => { this.parar(); this.ir(this.visiveis.length - 1); };
+    P.querySelector('[data-a=play]').onclick = () => this.timer ? this.parar() : this.tocar();
+    P.querySelector('[data-a=vel]').onchange = () => { if (this.timer) { this.parar(); this.tocar(); } };
+    P.querySelector("input[type=range]").oninput = e => { this.parar(); this.ir(+e.target.value); };
+    P.querySelector("tbody").onclick = e => { const tr = e.target.closest("tr"); if (tr) { this.parar(); this.ir(+tr.dataset.v); } };
+    const cb = P.querySelector('[data-a=res]');
+    if (cb) cb.onchange = () => {
+      const k = this.visiveis[this.v]; this.resumido = cb.checked; this.filtrar();
+      let v = this.visiveis.findIndex(x => x >= k); this.ir(v < 0 ? this.visiveis.length - 1 : v);
+    };
+  }
+  ir(v) {
+    if (!this.res) return;
+    v = Math.max(0, Math.min(this.visiveis.length - 1, v)); this.v = v;
+    const passo = this.res.passos[this.visiveis[v]], P = this.painel;
+    P.querySelector(".q").textContent = passo.estado;
+    P.querySelector(".delta").textContent = passo.transicao;
+    P.querySelector("input[type=range]").value = v;
+    P.querySelector(".contador").textContent = `passo ${passo.passo} / ${this.res.passos.at(-1).passo}`;
+    this.cfg.desenhar(P, passo, this.res);
+    const parou = !this.res.aceita && passo === this.res.passos.at(-1);
+    P.querySelectorAll(".fita .celula.cabecote").forEach(c => c.classList.toggle("bloqueio", parou));
+    P.querySelectorAll("tr.atual").forEach(tr => tr.classList.remove("atual"));
+    const tr = P.querySelector(`tr[data-v="${v}"]`);
+    if (tr) { tr.classList.add("atual"); const w = P.querySelector(".tabela-wrap");
+      if (tr.offsetTop < w.scrollTop + 30 || tr.offsetTop > w.scrollTop + w.clientHeight - 30) w.scrollTop = tr.offsetTop - w.clientHeight / 2; }
+    const c = P.querySelector(".celula.cabecote"), f = P.querySelector(".fita-wrap");
+    if (c && f) { const x = c.offsetLeft - f.offsetLeft; if (x < f.scrollLeft || x > f.scrollLeft + f.clientWidth - 40) f.scrollLeft = x - f.clientWidth / 2; }
+  }
+  tocar() {
+    if (this.v >= this.visiveis.length - 1) this.ir(0);
+    const ms = +this.painel.querySelector("[data-a=vel]").value;
+    this.painel.querySelector("[data-a=play]").textContent = "⏸";
+    this.timer = setInterval(() => { if (this.v >= this.visiveis.length - 1) this.parar(); else this.ir(this.v + 1); }, ms);
+  }
+  parar() {
+    clearInterval(this.timer); this.timer = null;
+    const b = this.painel.querySelector("[data-a=play]"); if (b) b.textContent = "▶";
+  }
+}
+
+const COMPLEMENTO = { A: "T", T: "A", C: "G", G: "C" };
+const simAP = new Simulador($("#painel-ap"), {
+  resumivel: false,
+  colunas: ["Passo", "Estado", "Pos", "Leitura (lido|restante)", "Pilha (topo→base)", "Transição"],
+  linha: (p, r) => [p.passo, p.estado, p.posicao, esc(p.lida) + "<b>|</b>" + esc(p.restante), esc(p.pilha), esc(p.transicao)],
+  esqueleto: `<div class="fita-wrap"><div class="rotulo">Fita de entrada (somente leitura)</div><div class="fita"></div></div>
+              <div class="pilha-wrap"><div class="rotulo">Pilha</div><div class="pilha"></div></div>`,
+  legenda: `<span style="--c:var(--head)">cabeçote de leitura</span><span style="--c:var(--soft)">já lido</span><span style="--c:var(--haste-bg)">topo da pilha (contorno)</span>`,
+  desenhar(P, p, r) {
+    const s = r.cadeia, pos = p.posicao - 1;
+    P.querySelector(".fita").innerHTML = [...s].map((c, k) =>
+      `<div class="celula ${k < pos ? "lida" : ""} ${k === pos ? "cabecote" : ""}">${esc(c)}<span class="idx">${k + 1}</span></div>`).join("")
+      + `<div class="celula fim ${pos >= s.length ? "cabecote" : ""}">fim</div>`;
+    const pilha = [...p.pilha];
+    P.querySelector(".pilha").innerHTML = pilha.map((c, k) =>
+      `<div class="celula ${k === 0 ? "topo" : ""} ${c === "Z" ? "fundo" : ""}" title="${c in COMPLEMENTO ? "espera " + COMPLEMENTO[c] : ""}">${esc(c)}</div>`).join("");
+  },
+});
+
+const simALL = new Simulador($("#painel-all"), {
+  resumivel: true,
+  colunas: ["Passo", "Estado", "Cab", "Fita ([ ] = cabeçote)", "Transição"],
+  linha: p => [p.passo, p.estado, p.cabecote, esc(p.fita.slice(0, p.cabecote)) + "<b>[" + esc(p.fita[p.cabecote]) + "]</b>" + esc(p.fita.slice(p.cabecote + 1)), esc(p.transicao)],
+  esqueleto: `<div class="fita-wrap"><div class="rotulo">Fita limitada pelos marcadores &lt; e &gt;</div><div class="fita"></div></div>`,
+  legenda: `<span style="--c:var(--head)">cabeçote</span><span style="--c:var(--alca-bg)">minúscula: 1ª metade marcada</span><span style="--c:var(--ok-bg)">* conferida</span><span style="--c:var(--soft)">marcador</span>`,
+  desenhar(P, p) {
+    P.querySelector(".fita").innerHTML = [...p.fita].map((c, k) => {
+      const cls = c === "<" || c === ">" ? "marca" : c === "*" ? "conferida" : /[a-z]/.test(c) ? "minuscula" : "";
+      const idx = c === "<" || c === ">" ? "" : k;
+      return `<div class="celula ${cls} ${k === p.cabecote ? "cabecote" : ""}">${esc(c)}<span class="idx">${idx}</span></div>`;
+    }).join("");
+  },
+});
+
+/* ------------------------------------------------------------- resultado */
+function selo(r) {
+  if (!r) return `<span class="selo neutro">não executou</span>`;
+  return `<span class="selo ${r.aceita ? "ok" : "bad"}">${esc(r.decisao)}</span>`;
+}
+function mostrarResultado(d) {
+  const box = $("#resultado"); box.hidden = false;
+  if (d.erro && !d.cadeia) { box.innerHTML = `<div class="final warn">${esc(d.erro)}</div>`; return; }
+  if (d.erro) {
+    box.innerHTML = `<div class="final warn">ERRO — cadeia não submetida ao autômato<small>${esc(d.erro)}</small></div>`;
+    simAP.limpar("A cadeia contém símbolo fora do alfabeto; o autômato não foi executado.");
+    simALL.limpar("A cadeia contém símbolo fora do alfabeto; o autômato não foi executado.");
+    return;
+  }
+  if (d.modo === "ap" || d.modo === "all") {
+    const r = d[d.modo], nome = d.modo === "ap" ? "Autômato de Pilha" : "Autômato Linearmente Limitado";
+    box.innerHTML = `<div class="final ${r.aceita ? "ok" : "bad"}">${nome}: ${esc(r.decisao)}<small>${esc(r.motivo)}</small></div>`;
+    return;
+  }
+  const cls = d.aceita ? "ok" : "bad";
+  box.innerHTML = `<div class="etapas">
+      <div class="etapa"><h3>Etapa 1 · Autômato de Pilha ${selo(d.ap)}</h3><p>${esc(d.ap.motivo)}</p></div>
+      <div class="seta">→</div>
+      <div class="etapa"><h3>Etapa 2 · ALL ${selo(d.all)}</h3>
+        <p>${d.all ? `Trecho após <code>#</code>: <code>${esc(d.trecho_all)}</code>. ${esc(d.all.motivo)}` : "Sem execução: a cadeia foi rejeitada pelo AP."}</p></div>
+    </div>
+    <div class="final ${cls}">Decisão final: ${esc(d.decisao)}</div>`;
+}
+
+async function executar(modo) {
+  const cadeia = entrada.value.trim();
+  const d = await api("/api/validar", { cadeia, modo });
+  mostrarResultado(d);
+  if (d.erro) return;
+  if (d.ap) simAP.carregar(d.ap, `AP sobre '${d.ap.cadeia}' (n = ${d.ap.cadeia.length})`);
+  else simAP.limpar("Modo “Só ALL”: o autômato de pilha não foi executado.");
+  if (d.all) { const n = d.all.cadeia.length;
+    simALL.carregar(d.all, `ALL sobre '${d.all.cadeia}' (n = ${n}; ${n} células graváveis + 2 marcadores)`); }
+  else simALL.limpar(modo === "ap" ? "Modo “Só AP”: o ALL não foi executado." : "O ALL não executou porque o AP rejeitou a cadeia.");
+  abrirAba(modo === "all" || (modo === "completo" && d.ap.aceita && !d.all.aceita) ? "all" : "ap");
+}
+document.querySelectorAll("[data-modo]").forEach(b => b.addEventListener("click", () => executar(b.dataset.modo)));
+
+$("#btn-derivar").addEventListener("click", async () => {
+  const d = await api("/api/derivar", { cadeia: entrada.value.trim() });
+  $("#painel-der").innerHTML = `<div class="card">${d.erro
+    ? `<p class="erro-msg">Não há derivação: ${esc(d.erro)}</p>` : `<pre>${esc(d.texto)}</pre>`}</div>`;
+  abrirAba("der");
+});
+
+document.addEventListener("keydown", e => {
+  if (e.target.matches("input, select, textarea")) return;
+  const sim = $("#painel-ap").classList.contains("ativo") ? simAP : $("#painel-all").classList.contains("ativo") ? simALL : null;
+  if (!sim || !sim.res) return;
+  if (e.key === "ArrowRight") { sim.parar(); sim.ir(sim.v + 1); e.preventDefault(); }
+  else if (e.key === "ArrowLeft") { sim.parar(); sim.ir(sim.v - 1); e.preventDefault(); }
+  else if (e.key === " ") { sim.timer ? sim.parar() : sim.tocar(); e.preventDefault(); }
+});
+
+/* --------------------------------------------------------- inicialização */
+(async () => {
+  desenharSegmentos();
+  const d = await api("/api/especificacao");
+  $("#exemplos").innerHTML = d.exemplos.map((x, k) => `<button data-k="${k}" title="${esc(x.cadeia)}">${esc(x.rotulo)}</button>`).join("");
+  $("#exemplos").onclick = e => { const b = e.target.closest("button"); if (!b) return;
+    const x = d.exemplos[+b.dataset.k]; entrada.value = x.cadeia; desenharSegmentos(); executar(x.modo); };
+  $("#painel-esp").innerHTML = `<div class="card"><pre>${esc(d.glc)}</pre><pre>${esc(d.ap)}</pre><pre>${esc(d.all)}</pre></div>`;
+  // Parâmetros opcionais na URL: #cadeia=...&modo=completo|ap|all&aba=ap|all|der|esp&passo=N
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.get("cadeia")) { entrada.value = h.get("cadeia"); desenharSegmentos(); }
+  await executar(h.get("modo") || "completo");
+  const aba = h.get("aba");
+  if (aba === "der") $("#btn-derivar").click(); else if (aba) abrirAba(aba);
+  if (h.get("passo") && (aba === "ap" || aba === "all")) {
+    const sim = aba === "ap" ? simAP : simALL;
+    if (sim.res) { sim.resumido && sim.painel.querySelector("[data-a=res]").click();
+      sim.ir(sim.visiveis.findIndex(k => sim.res.passos[k].passo >= +h.get("passo"))); }
+  }
+})();
+</script>
+</body>
+</html>

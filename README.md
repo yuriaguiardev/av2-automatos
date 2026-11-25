@@ -58,7 +58,16 @@ python -m validador_dna especificacao
 # modo interativo no terminal e interface gráfica
 python -m validador_dna interativo
 python -m validador_dna gui
+
+# interface web no navegador (abre http://127.0.0.1:8000; não precisa de tkinter)
+python -m validador_dna web
+python -m validador_dna web --porta 8080 --sem-navegador
 ```
+
+A interface web mostra a cadeia segmentada (haste 5′, alça, haste 3′, região) e as duas etapas do fluxo. Ela também simula
+os autômatos passo a passo (fita, cabeçote e pilha animados, com tabela de rastreamento clicável), a derivação na GLC e a
+especificação formal. Atalhos: ← / → avançam passos, espaço reproduz/pausa. Um link como
+`http://127.0.0.1:8000/#cadeia=GGACgaaGTCC%23ATGATG&aba=ap&passo=10` abre direto num cenário (o `#` da cadeia vira `%23`).
 
 No PowerShell, use aspas em volta da cadeia por causa do `#`.
 Códigos de saída: `0` = aceita, `1` = rejeitada, `2` = símbolo fora do alfabeto.
@@ -110,6 +119,8 @@ validador_dna/
   formatacao.py       tabelas de rastreamento e especificações
   __main__.py         linha de comando
   gui.py              interface gráfica (Tkinter)
+  servidor_web.py     interface web (http.server, sem dependências) + API JSON
+  web/index.html      página da interface web
 dados/                casos de teste (JSON)
 tests/                testes pytest
 scripts/              geração de resultados, diagramas e relatório
