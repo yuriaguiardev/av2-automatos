@@ -23,8 +23,9 @@ COR_NO = "#ffffff"
 
 
 class Diagrama:
-    def __init__(self, largura: int, altura: int, titulo: str):
+    def __init__(self, largura: int, altura: int, titulo: str, ident: str = "d"):
         self.l, self.a = largura, altura
+        self.ident = ident  # prefixo do id do marcador de seta (único por diagrama na mesma página)
         self.partes: list[str] = []
         self.pos: dict[str, tuple[float, float]] = {}
         self.titulo = titulo
@@ -39,7 +40,7 @@ class Diagrama:
         texto = rotulo or nome
         self.partes.append(f'<text x="{x}" y="{y + 5}" text-anchor="middle" class="no">{texto}</text>')
         if inicial:
-            self.partes.append(f'<line x1="{x - R - 34}" y1="{y}" x2="{x - R - 2}" y2="{y}" class="seta"/>')
+            self.partes.append(f'<line x1="{x - R - 34}" y1="{y}" x2="{x - R - 2}" y2="{y}" class="seta-{self.ident}"/>')
             self.partes.append(f'<text x="{x - R - 36}" y="{y + 20}" class="rot" text-anchor="start">início</text>')
 
     # ------------------------------------------------------------ arestas
@@ -52,7 +53,8 @@ class Diagrama:
             self.partes.append(f'<text x="{x}" y="{y + i * 14}" text-anchor="{ancora}" class="rot">{escape(linha)}</text>')
 
     def seta(self, a: str, b: str, rotulo: list[str], curva: float = 0.0, dx: float = 0, dy: float = -8,
-             ancora: str = "middle") -> None:
+             ancora: str = "middle", t: float = 0.5) -> None:
+        """Seta de a para b; o rotulo fica no ponto t da curva (0 = origem, 1 = destino)."""
         (x1, y1), (x2, y2) = self.pos[a], self.pos[b]
         mx, my = (x1 + x2) / 2, (y1 + y2) / 2
         d = math.hypot(x2 - x1, y2 - y1)
@@ -60,22 +62,26 @@ class Diagrama:
         cx, cy = mx + nx * curva, my + ny * curva
         sx, sy = self._borda(x1, y1, cx, cy)
         ex, ey = self._borda(x2, y2, cx, cy)
-        self.partes.append(f'<path d="M{sx:.1f},{sy:.1f} Q{cx:.1f},{cy:.1f} {ex:.1f},{ey:.1f}" class="seta"/>')
-        # ponto medio da curva quadratica
-        px, py = 0.25 * sx + 0.5 * cx + 0.25 * ex, 0.25 * sy + 0.5 * cy + 0.25 * ey
+        self.partes.append(f'<path d="M{sx:.1f},{sy:.1f} Q{cx:.1f},{cy:.1f} {ex:.1f},{ey:.1f}" class="seta-{self.ident}"/>')
+        # ponto t da curva quadratica
+        u = 1 - t
+        px, py = u * u * sx + 2 * u * t * cx + t * t * ex, u * u * sy + 2 * u * t * cy + t * t * ey
         self._rotulo(px + dx, py + dy, rotulo, ancora)
 
-    def laco(self, a: str, rotulo: list[str], lado: str = "cima") -> None:
+    def laco(self, a: str, rotulo: list[str], lado: str | float = "cima") -> None:
+        """Laco no estado a. lado: cima/baixo/esq/dir ou um angulo em graus (0 = direita, 90 = baixo)."""
         x, y = self.pos[a]
-        ang = {"cima": -90, "baixo": 90, "esq": 180, "dir": 0}[lado]
+        ang = lado if isinstance(lado, (int, float)) else {"cima": -90, "baixo": 90, "esq": 180, "dir": 0}[lado]
         t = math.radians(ang)
+        if isinstance(lado, (int, float)):
+            lado = "dir" if math.cos(t) > 0.35 else ("esq" if math.cos(t) < -0.35 else ("baixo" if math.sin(t) > 0 else "cima"))
         a1, a2 = t - 0.45, t + 0.45
         sx, sy = x + R * math.cos(a1), y + R * math.sin(a1)
         ex, ey = x + R * math.cos(a2), y + R * math.sin(a2)
         k = 62
         c1x, c1y = x + k * math.cos(a1 - 0.25), y + k * math.sin(a1 - 0.25)
         c2x, c2y = x + k * math.cos(a2 + 0.25), y + k * math.sin(a2 + 0.25)
-        self.partes.append(f'<path d="M{sx:.1f},{sy:.1f} C{c1x:.1f},{c1y:.1f} {c2x:.1f},{c2y:.1f} {ex:.1f},{ey:.1f}" class="seta"/>')
+        self.partes.append(f'<path d="M{sx:.1f},{sy:.1f} C{c1x:.1f},{c1y:.1f} {c2x:.1f},{c2y:.1f} {ex:.1f},{ey:.1f}" class="seta-{self.ident}"/>')
         lx, ly = x + 58 * math.cos(t), y + 58 * math.sin(t)
         if lado == "cima":
             self._rotulo(lx, ly - 6 - 14 * (len(rotulo) - 1), rotulo)
@@ -92,12 +98,13 @@ class Diagrama:
 
     def svg(self) -> str:
         estilo = f"""
-  <defs><marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+  <defs><marker id="ponta-{self.ident}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
     <path d="M0,0 L10,5 L0,10 z" fill="{COR_TRACO}"/></marker></defs>
   <style>
-    .seta {{ fill: none; stroke: {COR_TRACO}; stroke-width: 1.4; marker-end: url(#ponta); }}
+    .seta-{self.ident} {{ fill: none; stroke: {COR_TRACO}; stroke-width: 1.4; marker-end: url(#ponta-{self.ident}); }}
     .no {{ font: 600 14px 'Segoe UI', Arial, sans-serif; fill: #111827; }}
-    .rot {{ font: 12px Consolas, 'Courier New', monospace; fill: {COR_ROTULO}; }}
+    .rot {{ font: 12px Consolas, 'Courier New', monospace; fill: {COR_ROTULO};
+            paint-order: stroke; stroke: white; stroke-width: 4px; stroke-linejoin: round; }}
     .nota {{ font: 13px 'Segoe UI', Arial, sans-serif; fill: #374151; }}
     .titulo {{ font: 700 17px 'Segoe UI', Arial, sans-serif; fill: #111827; }}
   </style>"""
@@ -108,7 +115,7 @@ class Diagrama:
 
 
 def diagrama_ap() -> str:
-    d = Diagrama(1150, 470, "Autômato de Pilha — estrutura do grampo (aceitação por estado final q15)")
+    d = Diagrama(1150, 470, "Autômato de Pilha — estrutura do grampo (aceitação por estado final q15)", "ap")
     y1, y2 = 120, 330
     for i in range(9):
         d.estado(f"q{i}", 95 + i * 122, y1, inicial=i == 0)
@@ -134,19 +141,27 @@ def diagrama_ap() -> str:
     return d.svg()
 
 
-def diagrama_all() -> str:
-    d = Diagrama(1000, 800, "Autômato Linearmente Limitado — repetição em tandem uu")
-    d.estado("q0", 80, 130, inicial=True)
-    d.estado("q1", 240, 130)
-    d.estado("q2", 450, 130)
-    d.estado("q3", 660, 130)
-    d.estado("q4", 450, 290)
-    d.estado("qrj", 900, 130, cor=COR_REJ)
-    d.estado("q5", 240, 450)
-    d.estado("q6", 560, 450)
-    d.estado("q7", 560, 640)
-    d.estado("qac", 300, 640, final=True, cor=COR_FINAL)
-    d.estado("qX", 860, 640, rotulo="qX")
+def diagrama_all(notas: bool = True) -> str:
+    """Diagrama do ALL com os 4 estados reais da fase 3 (qA, qC, qG, qT), sem estado genérico.
+
+    notas=False omite a legenda de rodapé (usado nos slides, que explicam a notação no texto).
+    """
+    d = Diagrama(1300, 820 if notas else 770, "Autômato Linearmente Limitado — repetição em tandem uu", "all")
+    # Fase 1 (achar o meio) na linha de cima
+    d.estado("q0", 70, 100, inicial=True)
+    d.estado("q1", 210, 100)
+    d.estado("q2", 400, 100)
+    d.estado("q3", 590, 100)
+    d.estado("q4", 400, 250)
+    d.estado("qrj", 790, 100, cor=COR_REJ)
+    # Fase 2 (restaurar) e fase 3 (comparar): um estado por base carregada
+    d.estado("q5", 210, 680)
+    d.estado("q6", 790, 680)
+    d.estado("q7", 790, 285)
+    d.estado("qac", 885, 540, final=True, cor=COR_FINAL)
+    carregadores = {"A": 400, "C": 600, "G": 980, "T": 1180}
+    for b, x in carregadores.items():
+        d.estado("q" + b, x, 480)
 
     d.seta("q0", "q1", ["M1 </<,D"], dy=-10)
     d.seta("q1", "q2", ["M2 X/x,D"], dy=-10)
@@ -156,21 +171,46 @@ def diagrama_all() -> str:
     d.laco("q4", ["M10 X/X,E"], lado="baixo")
     d.seta("q4", "q1", ["M11 x/x,D"], dx=-12, dy=4, ancora="end")
     d.seta("q3", "qrj", ["M9 x/x,P", "(ímpar)"], dy=20)
-    d.seta("q1", "qrj", ["M4 >/>,P  (vazia)"], curva=-95, dy=-8)
+    d.seta("q1", "qrj", ["M4 >/>,P  (vazia)"], curva=-70, dy=-8)
     d.seta("q1", "q5", ["M3 x/X,D", "(meio achado)"], dx=-10, dy=0, ancora="end")
-    d.laco("q5", ["M12 x/X,D"], lado="baixo")
+    d.laco("q5", ["M12 x/X,D"], lado="esq")
     d.seta("q5", "q6", ["M13 >/>,E"], dy=-10)
-    d.laco("q6", ["M14 s/s,E", "s∈{X,x,*}"], lado="dir")
-    d.seta("q6", "q7", ["M15 </<,D"], dx=-10, dy=0, ancora="end")
-    d.laco("q7", ["M16 */*,D"], lado="baixo")
-    d.seta("q7", "qac", ["M18 >/>,P"], dy=-10)
-    d.seta("q7", "qX", ["M17 x/*,D"], dy=-10, curva=0)
-    d.laco("qX", ["M19 s/s,D", "s∈{x,*}"], lado="baixo")
-    d.seta("qX", "q6", ["M20 X/*,E"], dx=14, dy=0, ancora="start")
-    d.seta("qX", "qrj", ["M21 Y/Y,P", "(Y≠X)"], dx=10, dy=0, ancora="start")
-    d.nota(20, 765, ["qX representa os 4 estados qA, qC, qG, qT (a base X lida da 1ª cópia fica \"guardada\" no estado).",
-                     "X, Y ∈ {A,C,G,T}; x = minúscula de X; '*' = célula conferida.  Rótulo  lido/escrito,mov  (E, D, P). Sem transição ⇒ rejeição."])
-    return d.svg()
+    d.laco("q6", ["M14 s/s,E", "s∈{A,C,G,T,a,c,g,t,*}"], lado="baixo")
+    d.seta("q6", "q7", ["M15 </<,D"], dx=-8, dy=0, ancora="end", t=0.62)
+    d.laco("q7", ["M16 */*,D"], lado="cima")
+    d.seta("q7", "qac", ["M18 >/>,P"], dx=9, dy=4, ancora="start", t=0.8)
+
+    for b, x in carregadores.items():
+        q = "q" + b
+        esq = x < 790
+        externo = b in "AT"
+        outras = ",".join(o for o in carregadores if o != b)
+        # M17: q7 le a minuscula, grava '*' e passa a "carregar" a base no estado
+        if externo:
+            d.seta("q7", q, [f"M17 {b.lower()}/*,D"], dy=-8, t=0.55)
+        else:
+            d.seta("q7", q, [f"M17 {b.lower()}/*,D"], dx=8 if esq else -8, dy=4,
+                   ancora="start" if esq else "end", t=0.68)
+        # M19: atravessa o resto da 1a copia e as celulas ja conferidas
+        d.laco(q, ["M19 s/s,D"], lado="baixo")
+        # M20: achou a mesma base na 2a copia
+        if externo:
+            d.seta(q, "q6", [f"M20 {b}/*,E"], dx=-6 if esq else 6, dy=18, ancora="end" if esq else "start", t=0.4)
+        else:
+            d.seta(q, "q6", [f"M20 {b}/*,E"], dx=8 if esq else -8, dy=6, ancora="start" if esq else "end", t=0.45)
+        # M21: achou outra base: rejeita
+        d.seta(q, "qrj", ["M21 Y/Y,P", f"Y∈{{{outras}}}"], dx=-8 if esq else 8, dy=0,
+               ancora="end" if esq else "start", t=0.5)
+    if notas:
+        d.nota(20, 785, ["Fase 3: qA, qC, qG e qT guardam no estado a base lida da 1ª cópia (ex.: q7 lê a ⇒ qA; em qA, "
+                         "só A confere, e C, G ou T rejeita).",
+                         "X ∈ {A,C,G,T}, x = minúscula de X; em M19, s ∈ {a,c,g,t,*}; '*' = célula conferida.  "
+                         "Rótulo  lido/escrito,mov  (E, D, P)."])
+        return d.svg()
+    # slides: sem título nem legenda, recortando a faixa vazia do topo
+    d.titulo = ""
+    return d.svg().replace(f'viewBox="0 0 {d.l} {d.a}" width="{d.l}" height="{d.a}"',
+                           f'viewBox="0 40 {d.l - 60} {d.a - 40}" width="{d.l - 60}" height="{d.a - 40}"')
 
 
 def main() -> None:

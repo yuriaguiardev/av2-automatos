@@ -102,7 +102,9 @@ def quadros_fita() -> str:
         idx = [i for i, p in enumerate(passos) if p.transicao.startswith(regra + ":")]
         return idx[k - 1]
     eventos += [(primeiro("M8"), "M8: pontas marcadas"), (primeiro("M3"), "M3: meio achado"),
-                (primeiro("M13"), "M13: 2ª metade restaurada"), (primeiro("M20"), "M20: 1º par conferido"),
+                (primeiro("M13"), "M13: 2ª metade restaurada"),
+                (primeiro("M17"), f"M17: lê a, carrega A em {passos[primeiro('M17')].estado}"),
+                (primeiro("M20"), "M20: qA achou A, 1º par conferido"),
                 (len(passos) - 1, "M18: aceita")]
     linhas = []
     for i, rotulo in eventos:
@@ -286,21 +288,22 @@ O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª<
 
     # 10 - ALL diagrama
     add(f"""
-<h1>Autômato Linearmente Limitado</h1>
-<div class="cols c64" style="gap:26px">
- <div class="fig" style="margin-top:-14px">{diagrama_all()}</div>
- <div style="font-size:17px">
-  <p><b>M = (Q, Σ, Γ, δ, q0, &lt;, &gt;, qac, qrj)</b></p>
-  <ul style="font-size:16.5px">
-   <li><b>14 estados</b>: q0–q7, qA, qC, qG, qT, qac, qrj</li>
-   <li>Σ = {{A,C,G,T}}</li>
-   <li>Γ = Σ ∪ {{a,c,g,t, *, &lt;, &gt;}}</li>
-   <li>Início: q0 sobre <code>&lt;</code></li>
-   <li>δ(q, lido) = (p, escrito, E/D/P)</li>
-   <li>Aceita em <b>qac</b>; rejeita em <b>qrj</b> ou quando falta transição</li>
-   <li>Determinístico: {len(ALL.TRANSICOES)} transições</li>
+<h1 style="margin-bottom:10px">Autômato Linearmente Limitado</h1>
+<div style="display:grid;grid-template-columns:1fr 205px;gap:16px;align-items:start">
+ <div class="fig">{diagrama_all(notas=False)}</div>
+ <div style="font-size:14.5px;line-height:1.4">
+  <p style="font-size:14.5px;margin:0 0 6px"><b>M = (Q, Σ, Γ, δ, q0, &lt;, &gt;, qac, qrj)</b></p>
+  <ul style="padding-left:16px;margin:0">
+   <li style="font-size:14.5px"><b>14 estados</b>: q0–q7, qA, qC, qG, qT, qac, qrj</li>
+   <li style="font-size:14.5px">Σ = {{A,C,G,T}}; Γ = Σ ∪ {{a,c,g,t,*,&lt;,&gt;}}</li>
+   <li style="font-size:14.5px">Início: q0 sobre <code>&lt;</code></li>
+   <li style="font-size:14.5px">δ(q, lido) = (p, escrito, E/D/P)</li>
+   <li style="font-size:14.5px">Aceita em <b>qac</b>; rejeita em <b>qrj</b> ou sem transição</li>
+   <li style="font-size:14.5px">Determinístico: {len(ALL.TRANSICOES)} transições</li>
   </ul>
-  <p style="font-size:15px;color:#475569">qX “carrega” no estado a base que está sendo comparada.</p>
+  <div class="card teal" style="padding:10px 12px;margin-top:10px">
+   <p style="font-size:14px;margin:0"><b>Fase 3: um estado por base.</b> q7 lê <code>a</code> ⇒ <b>qA</b>. Em qA, achar <code>A</code> confere (M20);
+   achar C, G ou T rejeita (M21).</p></div>
  </div>
 </div>
 """, "João")
@@ -312,7 +315,8 @@ O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª<
  <div style="font-size:17px">
   <p><b style="color:#0e7c7b">Fase 1: achar o meio</b> (q1–q4). Marca as pontas alternadamente (X→x). Se sobrar uma base sem par, o comprimento é ímpar e a cadeia é rejeitada (M9).</p>
   <p><b style="color:#0e7c7b">Fase 2: restaurar</b> (q5). A 2ª metade volta a maiúsculas.</p>
-  <p><b style="color:#0e7c7b">Fase 3: comparar</b> (q6, q7, qX). Troca x por <code>*</code>, leva X no estado até a 1ª maiúscula: igual vira <code>*</code> (M20); diferente rejeita (M21). Só <code>*</code> ⇒ aceita.</p>
+  <p><b style="color:#0e7c7b">Fase 3: comparar</b> (q6, q7, qA, qC, qG, qT). q7 troca a 1ª minúscula por <code>*</code> e vai para o estado da base lida
+  (<code>a</code> ⇒ qA, <code>t</code> ⇒ qT…). Esse estado anda até a 1ª maiúscula: a mesma base vira <code>*</code> (M20), outra rejeita (M21). Só <code>*</code> ⇒ aceita.</p>
  </div>
  <div>
   <p style="margin:0;font-size:15px;color:#475569">Entrada <code>ATGATG</code> (n = 6, fita com 8 células)</p>
@@ -330,7 +334,7 @@ O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª<
   <ul style="font-size:16.5px">
    <li>Quem lê <code>&lt;</code> regrava <code>&lt;</code> e só vai para D. Quem lê <code>&gt;</code> regrava <code>&gt;</code> e só vai para E</li>
    <li>Cabeçote sempre em [0, n+1], verificado na tabela e em todo passo dos testes</li>
-   <li>Memória = reescrita das células (x, *) + estado qX</li></ul></div>
+   <li>Memória = reescrita das células (x, *) + estados qA, qC, qG, qT</li></ul></div>
  <div class="card teal"><h2>Por que sempre termina</h2>
   <ul style="font-size:16.5px">
    <li><b>AP:</b> sem ε, cada passo consome 1 símbolo ⇒ ≤ n passos</li>

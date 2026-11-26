@@ -189,6 +189,26 @@ def rastro_all_html(cadeia: str, resumido: bool = True) -> tuple[str, int]:
     return tabela(["Passo", "Estado", "Cab.", "Fita ([ ] = cabeçote)", "Transição"], linhas, "rastro"), len(passos) - 1
 
 
+def exemplo_fase3_html(cadeia: str) -> str:
+    """Ciclos da fase 3 do ALL (q7 -> qA/qC/qG/qT -> q6), extraidos do rastreamento real."""
+    passos = ALL.reconhecer(cadeia).passos
+    linhas, ciclo = [], None
+    for p in passos:
+        regra = p.transicao.split(":")[0]
+        if regra == "M17":
+            lida = passos[p.passo - 1].fita[p.cabecote - 1]
+            ciclo = [str(len(linhas) + 1), f"<code>{lida}</code> (célula {p.cabecote - 1})", f"<b>{p.estado}</b>"]
+        elif regra in ("M20", "M21") and ciclo:
+            celula = p.cabecote + 1 if regra == "M20" else p.cabecote
+            achada = passos[p.passo - 1].fita[celula]
+            res = '<span class="ok">iguais: grava * e volta a q6</span>' if regra == "M20" else \
+                '<span class="nok">diferentes: qrj, REJEITA</span>'
+            linhas.append(ciclo + [f"<code>{achada}</code> (célula {celula})", e(p.transicao), res])
+            ciclo = None
+    return tabela(["Ciclo", "q7 lê (1ª cópia)", "Estado que carrega", "Encontra (2ª cópia)", "Transição aplicada", "Resultado"],
+                  linhas)
+
+
 def montar() -> str:
     grupos = executar_todos()
     deriv = GLC.derivacao_mais_a_esquerda("GGACgaaGTCC#ATGATG")
@@ -205,6 +225,7 @@ def montar() -> str:
     rastro_all_curto, _ = rastro_all_html("ATGATG", resumido=False)
     rastro_all_int, passos_int = rastro_all_html("ATGGCAATGGCA")
     rastro_all_rej, passos_rej = rastro_all_html("ATGGCAATGGCT")
+    exemplo_fase3 = exemplo_fase3_html("ATGGCAATGGCT")
 
     capa = f"""
 <div class="capa">
@@ -386,10 +407,17 @@ está exatamente na 1ª célula da 2ª metade (M3).</li>
 </ol>
 {estados_all}
 <h3>5.5 Transições (leitura, escrita e movimento)</h3>
-<p>Notação δ(q, lido) = (p, escrito, movimento). X, Y ∈ {{A,C,G,T}}, x = minúscula de X, e qX é o estado que carrega X. As 21 regras esquemáticas
-geram {len(ALL.TRANSICOES)} transições concretas.</p>
+<p>Notação δ(q, lido) = (p, escrito, movimento). Nas fases 1 e 2, X ∈ {{A,C,G,T}} e x é a minúscula de X (por exemplo, M2 com
+X = G é δ(q1, G) = (q2, g, D)). Na fase 3 não há estado genérico: as regras M17, M19, M20 e M21 estão escritas para cada um dos
+quatro estados reais <b>qA, qC, qG e qT</b>, um por base que pode ser “carregada”. As 21 regras geram {len(ALL.TRANSICOES)} transições concretas.</p>
 {regras_all}
-<div class="fig">{diagrama_all()}<div class="legenda">Figura 3 — Diagrama de estados do ALL (<code>docs/diagramas/all.svg</code>); qX representa os 4 estados qA, qC, qG, qT.</div></div>
+<div class="fig">{diagrama_all()}<div class="legenda">Figura 3 — Diagrama de estados do ALL (<code>docs/diagramas/all.svg</code>), com os quatro estados
+da fase 3 (qA, qC, qG, qT) e as transições de cada um.</div></div>
+<p><b>Exemplo concreto da fase 3 (cenário 3, trecho <code>ATGGCAATGGCT</code>).</b> Ao fim da fase 2 a fita é
+<code>&lt;atggcaATGGCT&gt;</code>. Cada ciclo sai de q7, lê a próxima minúscula da 1ª cópia, grava <code>*</code> e vai para o estado da base
+lida; esse estado avança até a 1ª maiúscula da 2ª cópia. Os cinco primeiros ciclos passam por qA, qT, qG, qG e qC e conferem as bases.
+No sexto, qA (a 6ª base de u é A) encontra <b>T</b> na célula 12: não existe δ(qA, T) que leve a q6, só a regra M21, e a cadeia é rejeitada.</p>
+{exemplo_fase3}
 
 <h3>5.6 Limite da fita</h3>
 <p>O simulador cria a fita com exatamente n + 2 células, e nenhuma transição acrescenta células. As transições que leem <code>&lt;</code> regravam
@@ -434,7 +462,7 @@ falta transição (rejeita). Total ≤ n passos.</p>
 Fase 1: cada ciclo q1→q2→q3→q4→q1 converte 2 maiúsculas em minúsculas. Os laços internos (M5, M10) andam em um só sentido e param numa
 minúscula ou num marcador, que sempre existem, então cada ciclo tem ≤ 2n + 2 passos e há ≤ n/2 ciclos.
 Fase 2: q5 só anda para a direita até <code>&gt;</code> e q6 só para a esquerda até <code>&lt;</code> (≤ n + 1 passos cada).
-Fase 3: cada ciclo q7→qX→q6→q7 converte 2 células em <code>*</code> com ≤ 2n + 4 passos, e há ≤ n/2 ciclos. Assim o ALL sempre atinge qac ou qrj
+Fase 3: cada ciclo q7 → (qA, qC, qG ou qT) → q6 → q7 converte 2 células em <code>*</code> com ≤ 2n + 4 passos, e há ≤ n/2 ciclos. Assim o ALL sempre atinge qac ou qrj
 em O(n²) passos. Nas cadeias aceitas o total é exatamente (5n² + 18n + 16)/4, valor verificado nos testes.
 Como salvaguarda adicional, o número de configurações de um ALL é finito (|Q|·(n+2)·|Γ|<sup>n</sup>) e o simulador determinístico
 rejeitaria ao detectar uma configuração repetida. Pela prova acima, isso nunca ocorre.</p>
@@ -550,6 +578,8 @@ def navegador() -> str | None:
         r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
         r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
         r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
     ]
     for c in candidatos:
         if os.path.exists(c):

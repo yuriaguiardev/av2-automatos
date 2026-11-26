@@ -56,7 +56,8 @@ ESTADOS: dict[str, str] = {
     ESTADO_REJEITA: "rejeição (parada)",
 }
 
-# Regras esquematicas (X, Y em {A,C,G,T}; x = minuscula de X; Y != X em M21).
+# Regras esquematicas das fases 1 e 2 (X em {A,C,G,T}; x = minuscula de X).
+# Na fase 3 cada regra e escrita para os estados reais qA, qC, qG, qT (um por base carregada).
 REGRAS: list[dict[str, str]] = [
     {"id": "M1", "delta": "δ(q0, <) = (q1, <, D)", "descricao": "sai do marcador esquerdo"},
     {"id": "M2", "delta": "δ(q1, X) = (q2, x, D)", "descricao": "marca o extremo esquerdo (X → x)"},
@@ -74,11 +75,15 @@ REGRAS: list[dict[str, str]] = [
     {"id": "M14", "delta": "δ(q6, s) = (q6, s, E),  s ∈ {A,C,G,T,a,c,g,t,*}", "descricao": "retorna à esquerda"},
     {"id": "M15", "delta": "δ(q6, <) = (q7, <, D)", "descricao": "chegou ao marcador esquerdo"},
     {"id": "M16", "delta": "δ(q7, *) = (q7, *, D)", "descricao": "pula bases já conferidas"},
-    {"id": "M17", "delta": "δ(q7, x) = (qX, *, D)", "descricao": "pega a próxima base da 1ª cópia e a carrega no estado"},
+    *({"id": "M17", "delta": f"δ(q7, {X.lower()}) = (q{X}, *, D)",
+       "descricao": f"pega '{X.lower()}' da 1ª cópia, grava '*' e carrega {X} no estado q{X}"} for X in BASES),
     {"id": "M18", "delta": "δ(q7, >) = (qac, >, P)", "descricao": "tudo conferido: ACEITA"},
-    {"id": "M19", "delta": "δ(qX, s) = (qX, s, D),  s ∈ {a,c,g,t,*}", "descricao": "atravessa o resto da 1ª cópia e as conferidas da 2ª"},
-    {"id": "M20", "delta": "δ(qX, X) = (q6, *, E)", "descricao": "bases iguais: confere e volta"},
-    {"id": "M21", "delta": "δ(qX, Y) = (qrj, Y, P),  Y ≠ X", "descricao": "bases diferentes: REJEITA"},
+    *({"id": "M19", "delta": f"δ(q{X}, s) = (q{X}, s, D),  s ∈ {{a,c,g,t,*}}",
+       "descricao": f"q{X} atravessa o resto da 1ª cópia e as conferidas da 2ª"} for X in BASES),
+    *({"id": "M20", "delta": f"δ(q{X}, {X}) = (q6, *, E)",
+       "descricao": f"q{X} encontra {X} na 2ª cópia: confere e volta"} for X in BASES),
+    *({"id": "M21", "delta": f"δ(q{X}, Y) = (qrj, Y, P),  Y ∈ {{{', '.join(Y for Y in BASES if Y != X)}}}",
+       "descricao": f"q{X} encontra outra base: REJEITA"} for X in BASES),
 ]
 
 
@@ -132,14 +137,14 @@ def _gerar_transicoes() -> dict[tuple[str, str], TransicaoALL]:
         adicionar("M17", "q7", X.lower(), "q" + X, CONFERIDA, DIREITA)
     adicionar("M18", "q7", MARCA_DIR, ESTADO_ACEITA, MARCA_DIR, PARADO)
     for X in BASES:
-        qX = "q" + X
+        q_base = "q" + X  # qA, qC, qG ou qT
         for s in MINUSCULAS + (CONFERIDA,):
-            adicionar("M19", qX, s, qX, s, DIREITA)
+            adicionar("M19", q_base, s, q_base, s, DIREITA)
         for Y in BASES:
             if Y == X:
-                adicionar("M20", qX, Y, "q6", CONFERIDA, ESQUERDA)
+                adicionar("M20", q_base, Y, "q6", CONFERIDA, ESQUERDA)
             else:
-                adicionar("M21", qX, Y, ESTADO_REJEITA, Y, PARADO)
+                adicionar("M21", q_base, Y, ESTADO_REJEITA, Y, PARADO)
     return delta
 
 
