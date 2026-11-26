@@ -107,6 +107,8 @@ table.rastro td, table.rastro th { font-family: Consolas, monospace; font-size: 
 .ok { color: #166534; font-weight: 600; } .nok { color: #b91c1c; font-weight: 600; }
 .sumario li { margin: 1pt 0; }
 .quebra { page-break-before: always; }
+table.regras td code { white-space: nowrap; word-break: normal; }
+table.regras td:nth-child(2) { width: 62%; }
 """
 
 
@@ -218,7 +220,11 @@ def montar() -> str:
     estados_ap = tabela(["Estado", "Significado"], [[q, e(d)] for q, d in AP.ESTADOS.items()])
     regras_ap = tabela(["Regra", "δ", "Efeito"], [[r["id"], f"<code>{e(r['delta'])}</code>", e(r["descricao"])] for r in AP.REGRAS])
     estados_all = tabela(["Estado", "Significado"], [[q, e(d)] for q, d in ALL.ESTADOS.items()])
-    regras_all = tabela(["Regra", "δ", "Efeito"], [[r["id"], f"<code>{e(r['delta'])}</code>", e(r["descricao"])] for r in ALL.REGRAS])
+    def concretas(ts: list[str]) -> str:
+        pares = ["&emsp;".join(f"<code>{e(t)}</code>" for t in ts[i:i + 2]) for i in range(0, len(ts), 2)]
+        return "<br>".join(pares)
+    regras_all = tabela(["Regra", "Transições δ", "Efeito"],
+                        [[r["id"], concretas(r["transicoes"]), e(r["descricao"])] for r in ALL.REGRAS], "regras")
     producoes = "<br>".join(e(l) for l in GLC.producoes_agrupadas())
     int1 = "GATCCgaaaGGATC#ATGGCAATGGCA"
     rastro_ap = rastro_ap_html(int1)
@@ -407,9 +413,11 @@ está exatamente na 1ª célula da 2ª metade (M3).</li>
 </ol>
 {estados_all}
 <h3>5.5 Transições (leitura, escrita e movimento)</h3>
-<p>Notação δ(q, lido) = (p, escrito, movimento). Nas fases 1 e 2, X ∈ {{A,C,G,T}} e x é a minúscula de X (por exemplo, M2 com
-X = G é δ(q1, G) = (q2, g, D)). Na fase 3 não há estado genérico: as regras M17, M19, M20 e M21 estão escritas para cada um dos
-quatro estados reais <b>qA, qC, qG e qT</b>, um por base que pode ser “carregada”. As 21 regras geram {len(ALL.TRANSICOES)} transições concretas.</p>
+<p>Notação δ(q, lido) = (p, escrito, movimento). <b>Todas as transições usam apenas estados de Q e símbolos de Γ</b>: não há
+metavariáveis nem estado genérico. Uma regra agrupa as transições que fazem o mesmo trabalho com bases diferentes. Por exemplo, M2 são as
+4 transições δ(q1, A) = (q2, a, D), δ(q1, C) = (q2, c, D), δ(q1, G) = (q2, g, D) e δ(q1, T) = (q2, t, D): marcar a base livre mais à esquerda,
+qualquer que seja ela. Na fase 3, as regras M17, M19, M20 e M21 aparecem separadas para cada um dos quatro estados <b>qA, qC, qG e qT</b>,
+um por base que pode ser “carregada”. As 21 regras somam {len(ALL.TRANSICOES)} transições, listadas abaixo e geradas da mesma tabela δ que o simulador executa.</p>
 {regras_all}
 <div class="fig">{diagrama_all()}<div class="legenda">Figura 3 — Diagrama de estados do ALL (<code>docs/diagramas/all.svg</code>), com os quatro estados
 da fase 3 (qA, qC, qG, qT) e as transições de cada um.</div></div>

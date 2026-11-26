@@ -89,8 +89,9 @@ def especificacao_all() -> str:
         "Estados:",
         tabela(["Estado", "Significado"], [[q, d] for q, d in ALL.ESTADOS.items()]),
         "",
-        "Transições (X ∈ {A,C,G,T}; x = minúscula de X; qA, qC, qG, qT = estados que carregam a base):",
-        tabela(["Regra", "δ", "Efeito"], [[r["id"], r["delta"], r["descricao"]] for r in ALL.REGRAS]),
+        "Transições (todas com símbolos reais de Γ; qA, qC, qG, qT = estados que carregam a base):",
+        tabela(["Regra", "δ", "Efeito"], [[r["id"] if i == 0 else "", t, r["descricao"] if i == 0 else ""]
+                                          for r in ALL.REGRAS for i, t in enumerate(r["transicoes"])]),
         f"Total de transições concretas: {len(ALL.TRANSICOES)}. Combinações ausentes ⇒ rejeição.",
     ]
     return "\n".join(partes)

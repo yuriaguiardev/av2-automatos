@@ -313,7 +313,7 @@ O ALL verifica só o que a pilha não consegue: <b>a 1ª metade é igual à 2ª<
 <h1>O algoritmo em 3 fases, na própria fita</h1>
 <div class="cols" style="grid-template-columns:0.9fr 1.1fr;gap:28px">
  <div style="font-size:17px">
-  <p><b style="color:#0e7c7b">Fase 1: achar o meio</b> (q1–q4). Marca as pontas alternadamente (X→x). Se sobrar uma base sem par, o comprimento é ímpar e a cadeia é rejeitada (M9).</p>
+  <p><b style="color:#0e7c7b">Fase 1: achar o meio</b> (q1–q4). Marca as pontas alternadamente, de maiúscula para minúscula (A→a, C→c, G→g, T→t). Se sobrar uma base sem par, o comprimento é ímpar e a cadeia é rejeitada (M9).</p>
   <p><b style="color:#0e7c7b">Fase 2: restaurar</b> (q5). A 2ª metade volta a maiúsculas.</p>
   <p><b style="color:#0e7c7b">Fase 3: comparar</b> (q6, q7, qA, qC, qG, qT). q7 troca a 1ª minúscula por <code>*</code> e vai para o estado da base lida
   (<code>a</code> ⇒ qA, <code>t</code> ⇒ qT…). Esse estado anda até a 1ª maiúscula: a mesma base vira <code>*</code> (M20), outra rejeita (M21). Só <code>*</code> ⇒ aceita.</p>

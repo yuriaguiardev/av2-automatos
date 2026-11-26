@@ -8,10 +8,15 @@ este script apenas posiciona os estados e as setas.
 from __future__ import annotations
 
 import math
+import sys
 from html import escape
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(RAIZ))
+
+from validador_dna.automato_linear import TRANSICOES as DELTA_ALL  # noqa: E402
+
 SAIDA = RAIZ / "docs" / "diagramas"
 R = 25  # raio dos estados
 
@@ -141,76 +146,87 @@ def diagrama_ap() -> str:
     return d.svg()
 
 
+def rotulo_all(regra: str, origem: str, destino: str, por_linha: int = 2) -> list[str]:
+    """Rotulo de uma seta do ALL no formato  regra lido/escrito,mov , com as transicoes concretas
+    lidas da tabela δ real. Ex.: M5 A/A,D C/C,D G/G,D T/T,D (4 transicoes, quebradas em linhas)."""
+    pares = [f"{t.lido}/{t.escrito},{t.movimento}" for t in DELTA_ALL.values()
+             if t.regra == regra and t.origem == origem and t.destino == destino]
+    if not pares:
+        raise ValueError(f"sem transições {regra} de {origem} para {destino}")
+    linhas = [" ".join(pares[i:i + por_linha]) for i in range(0, len(pares), por_linha)]
+    linhas[0] = f"{regra} {linhas[0]}"
+    return linhas
+
+
 def diagrama_all(notas: bool = True) -> str:
-    """Diagrama do ALL com os 4 estados reais da fase 3 (qA, qC, qG, qT), sem estado genérico.
+    """Diagrama do ALL: só estados e símbolos reais (sem X, x, s, Y genéricos nem estado qX).
 
     notas=False omite a legenda de rodapé (usado nos slides, que explicam a notação no texto).
     """
-    d = Diagrama(1300, 820 if notas else 770, "Autômato Linearmente Limitado — repetição em tandem uu", "all")
+    d = Diagrama(1400, 950 if notas else 890, "Autômato Linearmente Limitado — repetição em tandem uu", "all")
+    r = rotulo_all
     # Fase 1 (achar o meio) na linha de cima
-    d.estado("q0", 70, 100, inicial=True)
-    d.estado("q1", 210, 100)
-    d.estado("q2", 400, 100)
-    d.estado("q3", 590, 100)
-    d.estado("q4", 400, 250)
-    d.estado("qrj", 790, 100, cor=COR_REJ)
+    d.estado("q0", 70, 140, inicial=True)
+    d.estado("q1", 230, 140)
+    d.estado("q2", 460, 140)
+    d.estado("q3", 690, 140)
+    d.estado("q4", 460, 330)
+    d.estado("qrj", 900, 140, cor=COR_REJ)
     # Fase 2 (restaurar) e fase 3 (comparar): um estado por base carregada
-    d.estado("q5", 210, 680)
-    d.estado("q6", 790, 680)
-    d.estado("q7", 790, 285)
-    d.estado("qac", 885, 540, final=True, cor=COR_FINAL)
-    carregadores = {"A": 400, "C": 600, "G": 980, "T": 1180}
+    d.estado("q5", 230, 760)
+    d.estado("q6", 900, 760)
+    d.estado("q7", 900, 360)
+    d.estado("qac", 995, 615, final=True, cor=COR_FINAL)
+    carregadores = {"A": 500, "C": 710, "G": 1090, "T": 1300}
     for b, x in carregadores.items():
-        d.estado("q" + b, x, 480)
+        d.estado("q" + b, x, 555)
 
-    d.seta("q0", "q1", ["M1 </<,D"], dy=-10)
-    d.seta("q1", "q2", ["M2 X/x,D"], dy=-10)
-    d.laco("q2", ["M5 X/X,D"], lado="baixo")
-    d.seta("q2", "q3", ["M6 x/x,E", "M7 >/>,E"], dy=-24)
-    d.seta("q3", "q4", ["M8 X/x,E"], dx=12, dy=4, ancora="start")
-    d.laco("q4", ["M10 X/X,E"], lado="baixo")
-    d.seta("q4", "q1", ["M11 x/x,D"], dx=-12, dy=4, ancora="end")
-    d.seta("q3", "qrj", ["M9 x/x,P", "(ímpar)"], dy=20)
-    d.seta("q1", "qrj", ["M4 >/>,P  (vazia)"], curva=-70, dy=-8)
-    d.seta("q1", "q5", ["M3 x/X,D", "(meio achado)"], dx=-10, dy=0, ancora="end")
-    d.laco("q5", ["M12 x/X,D"], lado="esq")
-    d.seta("q5", "q6", ["M13 >/>,E"], dy=-10)
-    d.laco("q6", ["M14 s/s,E", "s∈{A,C,G,T,a,c,g,t,*}"], lado="baixo")
-    d.seta("q6", "q7", ["M15 </<,D"], dx=-8, dy=0, ancora="end", t=0.62)
-    d.laco("q7", ["M16 */*,D"], lado="cima")
-    d.seta("q7", "qac", ["M18 >/>,P"], dx=9, dy=4, ancora="start", t=0.8)
+    d.seta("q0", "q1", r("M1", "q0", "q1"), dy=-10)
+    d.seta("q1", "q2", r("M2", "q1", "q2", por_linha=2), dy=-24)
+    d.laco("q2", r("M5", "q2", "q2"), lado="baixo")
+    d.seta("q2", "q3", r("M6", "q2", "q3") + r("M7", "q2", "q3"), dy=-38)
+    d.seta("q3", "q4", r("M8", "q3", "q4"), dx=12, dy=4, ancora="start")
+    d.laco("q4", r("M10", "q4", "q4"), lado="baixo")
+    d.seta("q4", "q1", r("M11", "q4", "q1", por_linha=2), dx=-12, dy=4, ancora="end", t=0.35)
+    d.seta("q3", "qrj", r("M9", "q3", "qrj", por_linha=2) + ["(ímpar)"], dy=22)
+    d.seta("q1", "qrj", [r("M4", "q1", "qrj")[0] + "  (vazia)"], curva=-115, dy=-8)
+    d.seta("q1", "q5", r("M3", "q1", "q5") + ["(meio achado)"], dx=-10, dy=0, ancora="end")
+    d.laco("q5", r("M12", "q5", "q5", por_linha=2), lado="esq")
+    d.seta("q5", "q6", r("M13", "q5", "q6"), dy=-10)
+    d.laco("q6", r("M14", "q6", "q6", por_linha=3), lado="baixo")
+    d.seta("q6", "q7", r("M15", "q6", "q7"), dx=-8, dy=0, ancora="end", t=0.62)
+    d.laco("q7", r("M16", "q7", "q7"), lado="cima")
+    d.seta("q7", "qac", r("M18", "q7", "qac"), dx=9, dy=4, ancora="start", t=0.8)
 
     for b, x in carregadores.items():
         q = "q" + b
-        esq = x < 790
+        esq = x < 900
         externo = b in "AT"
-        outras = ",".join(o for o in carregadores if o != b)
         # M17: q7 le a minuscula, grava '*' e passa a "carregar" a base no estado
         if externo:
-            d.seta("q7", q, [f"M17 {b.lower()}/*,D"], dy=-8, t=0.55)
+            d.seta("q7", q, r("M17", "q7", q), dy=-8, t=0.55)
         else:
-            d.seta("q7", q, [f"M17 {b.lower()}/*,D"], dx=8 if esq else -8, dy=4,
-                   ancora="start" if esq else "end", t=0.68)
+            d.seta("q7", q, r("M17", "q7", q), dx=8 if esq else -8, dy=4, ancora="start" if esq else "end", t=0.68)
         # M19: atravessa o resto da 1a copia e as celulas ja conferidas
-        d.laco(q, ["M19 s/s,D"], lado="baixo")
+        d.laco(q, r("M19", q, q), lado="baixo")
         # M20: achou a mesma base na 2a copia
         if externo:
-            d.seta(q, "q6", [f"M20 {b}/*,E"], dx=-6 if esq else 6, dy=18, ancora="end" if esq else "start", t=0.4)
+            d.seta(q, "q6", r("M20", q, "q6"), dx=-6 if esq else 6, dy=18, ancora="end" if esq else "start", t=0.62)
         else:
-            d.seta(q, "q6", [f"M20 {b}/*,E"], dx=8 if esq else -8, dy=6, ancora="start" if esq else "end", t=0.45)
+            d.seta(q, "q6", r("M20", q, "q6"), dx=8 if esq else -8, dy=6, ancora="start" if esq else "end", t=0.5)
         # M21: achou outra base: rejeita
-        d.seta(q, "qrj", ["M21 Y/Y,P", f"Y∈{{{outras}}}"], dx=-8 if esq else 8, dy=0,
+        d.seta(q, "qrj", r("M21", q, "qrj", por_linha=1), dx=-8 if esq else 8, dy=0,
                ancora="end" if esq else "start", t=0.5)
     if notas:
-        d.nota(20, 785, ["Fase 3: qA, qC, qG e qT guardam no estado a base lida da 1ª cópia (ex.: q7 lê a ⇒ qA; em qA, "
-                         "só A confere, e C, G ou T rejeita).",
-                         "X ∈ {A,C,G,T}, x = minúscula de X; em M19, s ∈ {a,c,g,t,*}; '*' = célula conferida.  "
-                         "Rótulo  lido/escrito,mov  (E, D, P)."])
+        d.nota(20, 912, ["Rótulo  lido/escrito,mov  (E = esquerda, D = direita, P = parado). Uma seta pode ter várias transições: "
+                         "M2 A/a,D C/c,D G/g,D T/t,D são 4 transições de q1 para q2.",
+                         "'*' = célula conferida. Fase 3: qA, qC, qG e qT guardam no estado a base lida da 1ª cópia. "
+                         "Todos os símbolos dos rótulos são símbolos reais de Γ."])
         return d.svg()
     # slides: sem título nem legenda, recortando a faixa vazia do topo
     d.titulo = ""
     return d.svg().replace(f'viewBox="0 0 {d.l} {d.a}" width="{d.l}" height="{d.a}"',
-                           f'viewBox="0 40 {d.l - 60} {d.a - 40}" width="{d.l - 60}" height="{d.a - 40}"')
+                           f'viewBox="0 40 {d.l} {d.a - 40}" width="{d.l}" height="{d.a - 40}"')
 
 
 def main() -> None:

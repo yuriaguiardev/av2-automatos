@@ -30,6 +30,8 @@ table.rastro td, table.rastro th { font-family: Consolas, monospace; font-size: 
 .ok { color: #166534; font-weight: 600; } .nok { color: #b91c1c; font-weight: 600; }
 .sumario li { margin: 1pt 0; }
 .quebra { page-break-before: always; }
+table.regras td code { white-space: nowrap; word-break: normal; }
+table.regras td:nth-child(2) { width: 62%; }
 </style></head>
 <body>
 <div class="capa">
@@ -310,11 +312,13 @@ está exatamente na 1ª célula da 2ª metade (M3).</li>
 </ol>
 <table class=""><thead><tr><th>Estado</th><th>Significado</th></tr></thead><tbody><tr><td>q0</td><td>início: cabeçote sobre o marcador &#x27;&lt;&#x27;</td></tr><tr><td>q1</td><td>Fase 1: procura a base não marcada mais à esquerda</td></tr><tr><td>q2</td><td>Fase 1: avança até o fim da região não marcada</td></tr><tr><td>q3</td><td>Fase 1: marca a base não marcada mais à direita</td></tr><tr><td>q4</td><td>Fase 1: volta até a última marca da esquerda</td></tr><tr><td>q5</td><td>Fase 2: meio encontrado; restaura a 2ª metade (minúscula → maiúscula)</td></tr><tr><td>q6</td><td>retorna ao marcador &#x27;&lt;&#x27;</td></tr><tr><td>q7</td><td>Fase 3: escolhe a próxima base da 1ª cópia</td></tr><tr><td>qA</td><td>Fase 3: carrega &#x27;A&#x27; até a 2ª cópia</td></tr><tr><td>qC</td><td>Fase 3: carrega &#x27;C&#x27; até a 2ª cópia</td></tr><tr><td>qG</td><td>Fase 3: carrega &#x27;G&#x27; até a 2ª cópia</td></tr><tr><td>qT</td><td>Fase 3: carrega &#x27;T&#x27; até a 2ª cópia</td></tr><tr><td>qac</td><td>aceitação (parada)</td></tr><tr><td>qrj</td><td>rejeição (parada)</td></tr></tbody></table>
 <h3>5.5 Transições (leitura, escrita e movimento)</h3>
-<p>Notação δ(q, lido) = (p, escrito, movimento). Nas fases 1 e 2, X ∈ {A,C,G,T} e x é a minúscula de X (por exemplo, M2 com
-X = G é δ(q1, G) = (q2, g, D)). Na fase 3 não há estado genérico: as regras M17, M19, M20 e M21 estão escritas para cada um dos
-quatro estados reais <b>qA, qC, qG e qT</b>, um por base que pode ser “carregada”. As 21 regras geram 92 transições concretas.</p>
-<table class=""><thead><tr><th>Regra</th><th>δ</th><th>Efeito</th></tr></thead><tbody><tr><td>M1</td><td><code>δ(q0, &lt;) = (q1, &lt;, D)</code></td><td>sai do marcador esquerdo</td></tr><tr><td>M2</td><td><code>δ(q1, X) = (q2, x, D)</code></td><td>marca o extremo esquerdo (X → x)</td></tr><tr><td>M3</td><td><code>δ(q1, x) = (q5, X, D)</code></td><td>não há base livre: meio encontrado; restaura a 1ª célula da 2ª metade</td></tr><tr><td>M4</td><td><code>δ(q1, &gt;) = (qrj, &gt;, P)</code></td><td>entrada vazia: REJEITA</td></tr><tr><td>M5</td><td><code>δ(q2, X) = (q2, X, D)</code></td><td>atravessa bases não marcadas</td></tr><tr><td>M6</td><td><code>δ(q2, x) = (q3, x, E)</code></td><td>achou a marca da direita: recua</td></tr><tr><td>M7</td><td><code>δ(q2, &gt;) = (q3, &gt;, E)</code></td><td>achou o marcador direito: recua</td></tr><tr><td>M8</td><td><code>δ(q3, X) = (q4, x, E)</code></td><td>marca o extremo direito (X → x)</td></tr><tr><td>M9</td><td><code>δ(q3, x) = (qrj, x, P)</code></td><td>base sem par: comprimento ímpar, REJEITA</td></tr><tr><td>M10</td><td><code>δ(q4, X) = (q4, X, E)</code></td><td>volta sobre bases não marcadas</td></tr><tr><td>M11</td><td><code>δ(q4, x) = (q1, x, D)</code></td><td>achou a última marca da esquerda</td></tr><tr><td>M12</td><td><code>δ(q5, x) = (q5, X, D)</code></td><td>restaura a 2ª metade (x → X)</td></tr><tr><td>M13</td><td><code>δ(q5, &gt;) = (q6, &gt;, E)</code></td><td>2ª metade restaurada</td></tr><tr><td>M14</td><td><code>δ(q6, s) = (q6, s, E),  s ∈ {A,C,G,T,a,c,g,t,*}</code></td><td>retorna à esquerda</td></tr><tr><td>M15</td><td><code>δ(q6, &lt;) = (q7, &lt;, D)</code></td><td>chegou ao marcador esquerdo</td></tr><tr><td>M16</td><td><code>δ(q7, *) = (q7, *, D)</code></td><td>pula bases já conferidas</td></tr><tr><td>M17</td><td><code>δ(q7, a) = (qA, *, D)</code></td><td>pega &#x27;a&#x27; da 1ª cópia, grava &#x27;*&#x27; e carrega A no estado qA</td></tr><tr><td>M17</td><td><code>δ(q7, c) = (qC, *, D)</code></td><td>pega &#x27;c&#x27; da 1ª cópia, grava &#x27;*&#x27; e carrega C no estado qC</td></tr><tr><td>M17</td><td><code>δ(q7, g) = (qG, *, D)</code></td><td>pega &#x27;g&#x27; da 1ª cópia, grava &#x27;*&#x27; e carrega G no estado qG</td></tr><tr><td>M17</td><td><code>δ(q7, t) = (qT, *, D)</code></td><td>pega &#x27;t&#x27; da 1ª cópia, grava &#x27;*&#x27; e carrega T no estado qT</td></tr><tr><td>M18</td><td><code>δ(q7, &gt;) = (qac, &gt;, P)</code></td><td>tudo conferido: ACEITA</td></tr><tr><td>M19</td><td><code>δ(qA, s) = (qA, s, D),  s ∈ {a,c,g,t,*}</code></td><td>qA atravessa o resto da 1ª cópia e as conferidas da 2ª</td></tr><tr><td>M19</td><td><code>δ(qC, s) = (qC, s, D),  s ∈ {a,c,g,t,*}</code></td><td>qC atravessa o resto da 1ª cópia e as conferidas da 2ª</td></tr><tr><td>M19</td><td><code>δ(qG, s) = (qG, s, D),  s ∈ {a,c,g,t,*}</code></td><td>qG atravessa o resto da 1ª cópia e as conferidas da 2ª</td></tr><tr><td>M19</td><td><code>δ(qT, s) = (qT, s, D),  s ∈ {a,c,g,t,*}</code></td><td>qT atravessa o resto da 1ª cópia e as conferidas da 2ª</td></tr><tr><td>M20</td><td><code>δ(qA, A) = (q6, *, E)</code></td><td>qA encontra A na 2ª cópia: confere e volta</td></tr><tr><td>M20</td><td><code>δ(qC, C) = (q6, *, E)</code></td><td>qC encontra C na 2ª cópia: confere e volta</td></tr><tr><td>M20</td><td><code>δ(qG, G) = (q6, *, E)</code></td><td>qG encontra G na 2ª cópia: confere e volta</td></tr><tr><td>M20</td><td><code>δ(qT, T) = (q6, *, E)</code></td><td>qT encontra T na 2ª cópia: confere e volta</td></tr><tr><td>M21</td><td><code>δ(qA, Y) = (qrj, Y, P),  Y ∈ {C, G, T}</code></td><td>qA encontra outra base: REJEITA</td></tr><tr><td>M21</td><td><code>δ(qC, Y) = (qrj, Y, P),  Y ∈ {A, G, T}</code></td><td>qC encontra outra base: REJEITA</td></tr><tr><td>M21</td><td><code>δ(qG, Y) = (qrj, Y, P),  Y ∈ {A, C, T}</code></td><td>qG encontra outra base: REJEITA</td></tr><tr><td>M21</td><td><code>δ(qT, Y) = (qrj, Y, P),  Y ∈ {A, C, G}</code></td><td>qT encontra outra base: REJEITA</td></tr></tbody></table>
-<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 820" width="1300" height="820">
+<p>Notação δ(q, lido) = (p, escrito, movimento). <b>Todas as transições usam apenas estados de Q e símbolos de Γ</b>: não há
+metavariáveis nem estado genérico. Uma regra agrupa as transições que fazem o mesmo trabalho com bases diferentes. Por exemplo, M2 são as
+4 transições δ(q1, A) = (q2, a, D), δ(q1, C) = (q2, c, D), δ(q1, G) = (q2, g, D) e δ(q1, T) = (q2, t, D): marcar a base livre mais à esquerda,
+qualquer que seja ela. Na fase 3, as regras M17, M19, M20 e M21 aparecem separadas para cada um dos quatro estados <b>qA, qC, qG e qT</b>,
+um por base que pode ser “carregada”. As 21 regras somam 92 transições, listadas abaixo e geradas da mesma tabela δ que o simulador executa.</p>
+<table class="regras"><thead><tr><th>Regra</th><th>Transições δ</th><th>Efeito</th></tr></thead><tbody><tr><td>M1</td><td><code>δ(q0, &lt;) = (q1, &lt;, D)</code></td><td>sai do marcador esquerdo</td></tr><tr><td>M2</td><td><code>δ(q1, A) = (q2, a, D)</code>&emsp;<code>δ(q1, C) = (q2, c, D)</code><br><code>δ(q1, G) = (q2, g, D)</code>&emsp;<code>δ(q1, T) = (q2, t, D)</code></td><td>marca o extremo esquerdo (maiúscula → minúscula)</td></tr><tr><td>M3</td><td><code>δ(q1, a) = (q5, A, D)</code>&emsp;<code>δ(q1, c) = (q5, C, D)</code><br><code>δ(q1, g) = (q5, G, D)</code>&emsp;<code>δ(q1, t) = (q5, T, D)</code></td><td>não há base livre: meio encontrado; restaura a 1ª célula da 2ª metade</td></tr><tr><td>M4</td><td><code>δ(q1, &gt;) = (qrj, &gt;, P)</code></td><td>entrada vazia: REJEITA</td></tr><tr><td>M5</td><td><code>δ(q2, A) = (q2, A, D)</code>&emsp;<code>δ(q2, C) = (q2, C, D)</code><br><code>δ(q2, G) = (q2, G, D)</code>&emsp;<code>δ(q2, T) = (q2, T, D)</code></td><td>atravessa bases não marcadas</td></tr><tr><td>M6</td><td><code>δ(q2, a) = (q3, a, E)</code>&emsp;<code>δ(q2, c) = (q3, c, E)</code><br><code>δ(q2, g) = (q3, g, E)</code>&emsp;<code>δ(q2, t) = (q3, t, E)</code></td><td>achou a marca da direita: recua</td></tr><tr><td>M7</td><td><code>δ(q2, &gt;) = (q3, &gt;, E)</code></td><td>achou o marcador direito: recua</td></tr><tr><td>M8</td><td><code>δ(q3, A) = (q4, a, E)</code>&emsp;<code>δ(q3, C) = (q4, c, E)</code><br><code>δ(q3, G) = (q4, g, E)</code>&emsp;<code>δ(q3, T) = (q4, t, E)</code></td><td>marca o extremo direito (maiúscula → minúscula)</td></tr><tr><td>M9</td><td><code>δ(q3, a) = (qrj, a, P)</code>&emsp;<code>δ(q3, c) = (qrj, c, P)</code><br><code>δ(q3, g) = (qrj, g, P)</code>&emsp;<code>δ(q3, t) = (qrj, t, P)</code></td><td>base sem par: comprimento ímpar, REJEITA</td></tr><tr><td>M10</td><td><code>δ(q4, A) = (q4, A, E)</code>&emsp;<code>δ(q4, C) = (q4, C, E)</code><br><code>δ(q4, G) = (q4, G, E)</code>&emsp;<code>δ(q4, T) = (q4, T, E)</code></td><td>volta sobre bases não marcadas</td></tr><tr><td>M11</td><td><code>δ(q4, a) = (q1, a, D)</code>&emsp;<code>δ(q4, c) = (q1, c, D)</code><br><code>δ(q4, g) = (q1, g, D)</code>&emsp;<code>δ(q4, t) = (q1, t, D)</code></td><td>achou a última marca da esquerda</td></tr><tr><td>M12</td><td><code>δ(q5, a) = (q5, A, D)</code>&emsp;<code>δ(q5, c) = (q5, C, D)</code><br><code>δ(q5, g) = (q5, G, D)</code>&emsp;<code>δ(q5, t) = (q5, T, D)</code></td><td>restaura a 2ª metade (minúscula → maiúscula)</td></tr><tr><td>M13</td><td><code>δ(q5, &gt;) = (q6, &gt;, E)</code></td><td>2ª metade restaurada</td></tr><tr><td>M14</td><td><code>δ(q6, A) = (q6, A, E)</code>&emsp;<code>δ(q6, C) = (q6, C, E)</code><br><code>δ(q6, G) = (q6, G, E)</code>&emsp;<code>δ(q6, T) = (q6, T, E)</code><br><code>δ(q6, a) = (q6, a, E)</code>&emsp;<code>δ(q6, c) = (q6, c, E)</code><br><code>δ(q6, g) = (q6, g, E)</code>&emsp;<code>δ(q6, t) = (q6, t, E)</code><br><code>δ(q6, *) = (q6, *, E)</code></td><td>retorna à esquerda</td></tr><tr><td>M15</td><td><code>δ(q6, &lt;) = (q7, &lt;, D)</code></td><td>chegou ao marcador esquerdo</td></tr><tr><td>M16</td><td><code>δ(q7, *) = (q7, *, D)</code></td><td>pula bases já conferidas</td></tr><tr><td>M17</td><td><code>δ(q7, a) = (qA, *, D)</code></td><td>pega &#x27;a&#x27; da 1ª cópia, grava &#x27;*&#x27; e carrega A no estado qA</td></tr><tr><td>M17</td><td><code>δ(q7, c) = (qC, *, D)</code></td><td>pega &#x27;c&#x27; da 1ª cópia, grava &#x27;*&#x27; e carrega C no estado qC</td></tr><tr><td>M17</td><td><code>δ(q7, g) = (qG, *, D)</code></td><td>pega &#x27;g&#x27; da 1ª cópia, grava &#x27;*&#x27; e carrega G no estado qG</td></tr><tr><td>M17</td><td><code>δ(q7, t) = (qT, *, D)</code></td><td>pega &#x27;t&#x27; da 1ª cópia, grava &#x27;*&#x27; e carrega T no estado qT</td></tr><tr><td>M18</td><td><code>δ(q7, &gt;) = (qac, &gt;, P)</code></td><td>tudo conferido: ACEITA</td></tr><tr><td>M19</td><td><code>δ(qA, a) = (qA, a, D)</code>&emsp;<code>δ(qA, c) = (qA, c, D)</code><br><code>δ(qA, g) = (qA, g, D)</code>&emsp;<code>δ(qA, t) = (qA, t, D)</code><br><code>δ(qA, *) = (qA, *, D)</code></td><td>qA atravessa o resto da 1ª cópia e as conferidas da 2ª</td></tr><tr><td>M19</td><td><code>δ(qC, a) = (qC, a, D)</code>&emsp;<code>δ(qC, c) = (qC, c, D)</code><br><code>δ(qC, g) = (qC, g, D)</code>&emsp;<code>δ(qC, t) = (qC, t, D)</code><br><code>δ(qC, *) = (qC, *, D)</code></td><td>qC atravessa o resto da 1ª cópia e as conferidas da 2ª</td></tr><tr><td>M19</td><td><code>δ(qG, a) = (qG, a, D)</code>&emsp;<code>δ(qG, c) = (qG, c, D)</code><br><code>δ(qG, g) = (qG, g, D)</code>&emsp;<code>δ(qG, t) = (qG, t, D)</code><br><code>δ(qG, *) = (qG, *, D)</code></td><td>qG atravessa o resto da 1ª cópia e as conferidas da 2ª</td></tr><tr><td>M19</td><td><code>δ(qT, a) = (qT, a, D)</code>&emsp;<code>δ(qT, c) = (qT, c, D)</code><br><code>δ(qT, g) = (qT, g, D)</code>&emsp;<code>δ(qT, t) = (qT, t, D)</code><br><code>δ(qT, *) = (qT, *, D)</code></td><td>qT atravessa o resto da 1ª cópia e as conferidas da 2ª</td></tr><tr><td>M20</td><td><code>δ(qA, A) = (q6, *, E)</code></td><td>qA encontra A na 2ª cópia: confere e volta</td></tr><tr><td>M20</td><td><code>δ(qC, C) = (q6, *, E)</code></td><td>qC encontra C na 2ª cópia: confere e volta</td></tr><tr><td>M20</td><td><code>δ(qG, G) = (q6, *, E)</code></td><td>qG encontra G na 2ª cópia: confere e volta</td></tr><tr><td>M20</td><td><code>δ(qT, T) = (q6, *, E)</code></td><td>qT encontra T na 2ª cópia: confere e volta</td></tr><tr><td>M21</td><td><code>δ(qA, C) = (qrj, C, P)</code>&emsp;<code>δ(qA, G) = (qrj, G, P)</code><br><code>δ(qA, T) = (qrj, T, P)</code></td><td>qA encontra outra base: REJEITA</td></tr><tr><td>M21</td><td><code>δ(qC, A) = (qrj, A, P)</code>&emsp;<code>δ(qC, G) = (qrj, G, P)</code><br><code>δ(qC, T) = (qrj, T, P)</code></td><td>qC encontra outra base: REJEITA</td></tr><tr><td>M21</td><td><code>δ(qG, A) = (qrj, A, P)</code>&emsp;<code>δ(qG, C) = (qrj, C, P)</code><br><code>δ(qG, T) = (qrj, T, P)</code></td><td>qG encontra outra base: REJEITA</td></tr><tr><td>M21</td><td><code>δ(qT, A) = (qrj, A, P)</code>&emsp;<code>δ(qT, C) = (qrj, C, P)</code><br><code>δ(qT, G) = (qrj, G, P)</code></td><td>qT encontra outra base: REJEITA</td></tr></tbody></table>
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 950" width="1400" height="950">
   <defs><marker id="ponta-all" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
     <path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/></marker></defs>
   <style>
@@ -327,111 +331,133 @@ quatro estados reais <b>qA, qC, qG e qT</b>, um por base que pode ser “carrega
   </style>
   <rect width="100%" height="100%" fill="white"/>
   <text x="20" y="28" class="titulo">Autômato Linearmente Limitado — repetição em tandem uu</text>
-  <circle cx="70" cy="100" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="70" y="105" text-anchor="middle" class="no">q0</text>
-  <line x1="11" y1="100" x2="43" y2="100" class="seta-all"/>
-  <text x="9" y="120" class="rot" text-anchor="start">início</text>
-  <circle cx="210" cy="100" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="210" y="105" text-anchor="middle" class="no">q1</text>
-  <circle cx="400" cy="100" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="400" y="105" text-anchor="middle" class="no">q2</text>
-  <circle cx="590" cy="100" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="590" y="105" text-anchor="middle" class="no">q3</text>
-  <circle cx="400" cy="250" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="400" y="255" text-anchor="middle" class="no">q4</text>
-  <circle cx="790" cy="100" r="25" fill="#fee2e2" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="790" y="105" text-anchor="middle" class="no">qrj</text>
-  <circle cx="210" cy="680" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="210" y="685" text-anchor="middle" class="no">q5</text>
-  <circle cx="790" cy="680" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="790" y="685" text-anchor="middle" class="no">q6</text>
-  <circle cx="790" cy="285" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="790" y="290" text-anchor="middle" class="no">q7</text>
-  <circle cx="885" cy="540" r="25" fill="#dcfce7" stroke="#1f2937" stroke-width="1.6"/>
-  <circle cx="885" cy="540" r="21" fill="none" stroke="#1f2937" stroke-width="1.4"/>
-  <text x="885" y="545" text-anchor="middle" class="no">qac</text>
-  <circle cx="400" cy="480" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="400" y="485" text-anchor="middle" class="no">qA</text>
-  <circle cx="600" cy="480" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="600" y="485" text-anchor="middle" class="no">qC</text>
-  <circle cx="980" cy="480" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="980" y="485" text-anchor="middle" class="no">qG</text>
-  <circle cx="1180" cy="480" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
-  <text x="1180" y="485" text-anchor="middle" class="no">qT</text>
-  <path d="M95.0,100.0 Q140.0,100.0 185.0,100.0" class="seta-all"/>
-  <text x="140.0" y="90.0" text-anchor="middle" class="rot">M1 &lt;/&lt;,D</text>
-  <path d="M235.0,100.0 Q305.0,100.0 375.0,100.0" class="seta-all"/>
-  <text x="305.0" y="90.0" text-anchor="middle" class="rot">M2 X/x,D</text>
-  <path d="M410.9,122.5 C439.9,147.4 360.1,147.4 389.1,122.5" class="seta-all"/>
-  <text x="400.0" y="172.0" text-anchor="middle" class="rot">M5 X/X,D</text>
-  <path d="M425.0,100.0 Q495.0,100.0 565.0,100.0" class="seta-all"/>
-  <text x="495.0" y="76.0" text-anchor="middle" class="rot">M6 x/x,E</text>
-  <text x="495.0" y="90.0" text-anchor="middle" class="rot">M7 &gt;/&gt;,E</text>
-  <path d="M570.4,115.5 Q495.0,175.0 419.6,234.5" class="seta-all"/>
-  <text x="507.0" y="179.0" text-anchor="start" class="rot">M8 X/x,E</text>
-  <path d="M410.9,272.5 C439.9,297.4 360.1,297.4 389.1,272.5" class="seta-all"/>
-  <text x="400.0" y="322.0" text-anchor="middle" class="rot">M10 X/X,E</text>
-  <path d="M380.4,234.5 Q305.0,175.0 229.6,115.5" class="seta-all"/>
-  <text x="293.0" y="179.0" text-anchor="end" class="rot">M11 x/x,D</text>
-  <path d="M615.0,100.0 Q690.0,100.0 765.0,100.0" class="seta-all"/>
-  <text x="690.0" y="120.0" text-anchor="middle" class="rot">M9 x/x,P</text>
-  <text x="690.0" y="134.0" text-anchor="middle" class="rot">(ímpar)</text>
-  <path d="M234.3,94.1 Q500.0,30.0 765.7,94.1" class="seta-all"/>
-  <text x="500.0" y="54.06699333620129" text-anchor="middle" class="rot">M4 &gt;/&gt;,P  (vazia)</text>
-  <path d="M210.0,125.0 Q210.0,390.0 210.0,655.0" class="seta-all"/>
-  <text x="200.0" y="390.0" text-anchor="end" class="rot">M3 x/X,D</text>
-  <text x="200.0" y="404.0" text-anchor="end" class="rot">(meio achado)</text>
-  <path d="M187.5,690.9 C162.6,719.9 162.6,640.1 187.5,669.1" class="seta-all"/>
-  <text x="148.0" y="680.0" text-anchor="end" class="rot">M12 x/X,D</text>
-  <path d="M235.0,680.0 Q500.0,680.0 765.0,680.0" class="seta-all"/>
-  <text x="500.0" y="670.0" text-anchor="middle" class="rot">M13 &gt;/&gt;,E</text>
-  <path d="M800.9,702.5 C829.9,727.4 750.1,727.4 779.1,702.5" class="seta-all"/>
-  <text x="790.0" y="752.0" text-anchor="middle" class="rot">M14 s/s,E</text>
-  <text x="790.0" y="766.0" text-anchor="middle" class="rot">s∈{A,C,G,T,a,c,g,t,*}</text>
-  <path d="M790.0,655.0 Q790.0,482.5 790.0,310.0" class="seta-all"/>
-  <text x="782.0" y="441.1" text-anchor="end" class="rot">M15 &lt;/&lt;,D</text>
-  <path d="M779.1,262.5 C750.1,237.6 829.9,237.6 800.9,262.5" class="seta-all"/>
-  <text x="790.0" y="221.0" text-anchor="middle" class="rot">M16 */*,D</text>
-  <path d="M798.7,308.4 Q837.5,412.5 876.3,516.6" class="seta-all"/>
-  <text x="869.7633646524059" y="478.94376827751023" text-anchor="start" class="rot">M18 &gt;/&gt;,P</text>
-  <path d="M767.6,296.2 Q595.0,382.5 422.4,468.8" class="seta-all"/>
-  <text x="577.7360679774997" y="383.13196601125014" text-anchor="middle" class="rot">M17 a/*,D</text>
-  <path d="M410.9,502.5 C439.9,527.4 360.1,527.4 389.1,502.5" class="seta-all"/>
-  <text x="400.0" y="552.0" text-anchor="middle" class="rot">M19 s/s,D</text>
-  <path d="M422.2,491.4 Q595.0,580.0 767.8,668.6" class="seta-all"/>
-  <text x="554.4490873140637" y="580.2815832379814" text-anchor="end" class="rot">M20 A/*,E</text>
-  <path d="M417.9,462.6 Q595.0,290.0 772.1,117.4" class="seta-all"/>
-  <text x="587.0" y="290.0" text-anchor="end" class="rot">M21 Y/Y,P</text>
-  <text x="587.0" y="304.0" text-anchor="end" class="rot">Y∈{C,G,T}</text>
-  <path d="M772.6,302.9 Q695.0,382.5 617.4,462.1" class="seta-all"/>
-  <text x="675.0807825421939" y="415.15393370669585" text-anchor="start" class="rot">M17 c/*,D</text>
-  <path d="M610.9,502.5 C639.9,527.4 560.1,527.4 589.1,502.5" class="seta-all"/>
-  <text x="600.0" y="552.0" text-anchor="middle" class="rot">M19 s/s,D</text>
-  <path d="M617.2,498.1 Q695.0,580.0 772.8,661.9" class="seta-all"/>
-  <text x="695.2218736547868" y="577.8124985839861" text-anchor="start" class="rot">M20 C/*,E</text>
-  <path d="M611.2,457.6 Q695.0,290.0 778.8,122.4" class="seta-all"/>
-  <text x="687.0" y="290.0" text-anchor="end" class="rot">M21 Y/Y,P</text>
-  <text x="687.0" y="304.0" text-anchor="end" class="rot">Y∈{A,G,T}</text>
-  <path d="M807.4,302.9 Q885.0,382.5 962.6,462.1" class="seta-all"/>
-  <text x="904.9192174578062" y="415.15393370669585" text-anchor="end" class="rot">M17 g/*,D</text>
-  <path d="M990.9,502.5 C1019.9,527.4 940.1,527.4 969.1,502.5" class="seta-all"/>
-  <text x="980.0" y="552.0" text-anchor="middle" class="rot">M19 s/s,D</text>
-  <path d="M962.8,498.1 Q885.0,580.0 807.2,661.9" class="seta-all"/>
-  <text x="884.7781263452134" y="577.8124985839861" text-anchor="end" class="rot">M20 G/*,E</text>
-  <path d="M968.8,457.6 Q885.0,290.0 801.2,122.4" class="seta-all"/>
-  <text x="893.0" y="290.0" text-anchor="start" class="rot">M21 Y/Y,P</text>
-  <text x="893.0" y="304.0" text-anchor="start" class="rot">Y∈{A,C,T}</text>
-  <path d="M812.4,296.2 Q985.0,382.5 1157.6,468.8" class="seta-all"/>
-  <text x="1002.2639320225003" y="383.13196601125014" text-anchor="middle" class="rot">M17 t/*,D</text>
-  <path d="M1190.9,502.5 C1219.9,527.4 1140.1,527.4 1169.1,502.5" class="seta-all"/>
-  <text x="1180.0" y="552.0" text-anchor="middle" class="rot">M19 s/s,D</text>
-  <path d="M1157.8,491.4 Q985.0,580.0 812.2,668.6" class="seta-all"/>
-  <text x="1025.5509126859363" y="580.2815832379814" text-anchor="start" class="rot">M20 T/*,E</text>
-  <path d="M1162.1,462.6 Q985.0,290.0 807.9,117.4" class="seta-all"/>
-  <text x="993.0" y="290.0" text-anchor="start" class="rot">M21 Y/Y,P</text>
-  <text x="993.0" y="304.0" text-anchor="start" class="rot">Y∈{A,C,G}</text>
-  <text x="20" y="785" class="nota">Fase 3: qA, qC, qG e qT guardam no estado a base lida da 1ª cópia (ex.: q7 lê a ⇒ qA; em qA, só A confere, e C, G ou T rejeita).</text>
-  <text x="20" y="801" class="nota">X ∈ {A,C,G,T}, x = minúscula de X; em M19, s ∈ {a,c,g,t,*}; &#x27;*&#x27; = célula conferida.  Rótulo  lido/escrito,mov  (E, D, P).</text>
+  <circle cx="70" cy="140" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="70" y="145" text-anchor="middle" class="no">q0</text>
+  <line x1="11" y1="140" x2="43" y2="140" class="seta-all"/>
+  <text x="9" y="160" class="rot" text-anchor="start">início</text>
+  <circle cx="230" cy="140" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="230" y="145" text-anchor="middle" class="no">q1</text>
+  <circle cx="460" cy="140" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="460" y="145" text-anchor="middle" class="no">q2</text>
+  <circle cx="690" cy="140" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="690" y="145" text-anchor="middle" class="no">q3</text>
+  <circle cx="460" cy="330" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="460" y="335" text-anchor="middle" class="no">q4</text>
+  <circle cx="900" cy="140" r="25" fill="#fee2e2" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="900" y="145" text-anchor="middle" class="no">qrj</text>
+  <circle cx="230" cy="760" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="230" y="765" text-anchor="middle" class="no">q5</text>
+  <circle cx="900" cy="760" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="900" y="765" text-anchor="middle" class="no">q6</text>
+  <circle cx="900" cy="360" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="900" y="365" text-anchor="middle" class="no">q7</text>
+  <circle cx="995" cy="615" r="25" fill="#dcfce7" stroke="#1f2937" stroke-width="1.6"/>
+  <circle cx="995" cy="615" r="21" fill="none" stroke="#1f2937" stroke-width="1.4"/>
+  <text x="995" y="620" text-anchor="middle" class="no">qac</text>
+  <circle cx="500" cy="555" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="500" y="560" text-anchor="middle" class="no">qA</text>
+  <circle cx="710" cy="555" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="710" y="560" text-anchor="middle" class="no">qC</text>
+  <circle cx="1090" cy="555" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="1090" y="560" text-anchor="middle" class="no">qG</text>
+  <circle cx="1300" cy="555" r="25" fill="#ffffff" stroke="#1f2937" stroke-width="1.6"/>
+  <text x="1300" y="560" text-anchor="middle" class="no">qT</text>
+  <path d="M95.0,140.0 Q150.0,140.0 205.0,140.0" class="seta-all"/>
+  <text x="150.0" y="130.0" text-anchor="middle" class="rot">M1 &lt;/&lt;,D</text>
+  <path d="M255.0,140.0 Q345.0,140.0 435.0,140.0" class="seta-all"/>
+  <text x="345.0" y="116.0" text-anchor="middle" class="rot">M2 A/a,D C/c,D</text>
+  <text x="345.0" y="130.0" text-anchor="middle" class="rot">G/g,D T/t,D</text>
+  <path d="M470.9,162.5 C499.9,187.4 420.1,187.4 449.1,162.5" class="seta-all"/>
+  <text x="460.0" y="212.0" text-anchor="middle" class="rot">M5 A/A,D C/C,D</text>
+  <text x="460.0" y="226.0" text-anchor="middle" class="rot">G/G,D T/T,D</text>
+  <path d="M485.0,140.0 Q575.0,140.0 665.0,140.0" class="seta-all"/>
+  <text x="575.0" y="102.0" text-anchor="middle" class="rot">M6 a/a,E c/c,E</text>
+  <text x="575.0" y="116.0" text-anchor="middle" class="rot">g/g,E t/t,E</text>
+  <text x="575.0" y="130.0" text-anchor="middle" class="rot">M7 &gt;/&gt;,E</text>
+  <path d="M670.7,155.9 Q575.0,235.0 479.3,314.1" class="seta-all"/>
+  <text x="587.0" y="239.0" text-anchor="start" class="rot">M8 A/a,E C/c,E</text>
+  <text x="587.0" y="253.0" text-anchor="start" class="rot">G/g,E T/t,E</text>
+  <path d="M470.9,352.5 C499.9,377.4 420.1,377.4 449.1,352.5" class="seta-all"/>
+  <text x="460.0" y="402.0" text-anchor="middle" class="rot">M10 A/A,E C/C,E</text>
+  <text x="460.0" y="416.0" text-anchor="middle" class="rot">G/G,E T/T,E</text>
+  <path d="M440.7,314.1 Q345.0,235.0 249.3,155.9" class="seta-all"/>
+  <text x="361.7177868627968" y="262.72338914752777" text-anchor="end" class="rot">M11 a/a,D c/c,D</text>
+  <text x="361.7177868627968" y="276.72338914752777" text-anchor="end" class="rot">g/g,D t/t,D</text>
+  <path d="M715.0,140.0 Q795.0,140.0 875.0,140.0" class="seta-all"/>
+  <text x="795.0" y="162.0" text-anchor="middle" class="rot">M9 a/a,P c/c,P</text>
+  <text x="795.0" y="176.0" text-anchor="middle" class="rot">g/g,P t/t,P</text>
+  <text x="795.0" y="190.0" text-anchor="middle" class="rot">(ímpar)</text>
+  <path d="M253.6,131.9 Q565.0,25.0 876.4,131.9" class="seta-all"/>
+  <text x="565.0" y="70.4414348623578" text-anchor="middle" class="rot">M4 &gt;/&gt;,P  (vazia)</text>
+  <path d="M230.0,165.0 Q230.0,450.0 230.0,735.0" class="seta-all"/>
+  <text x="220.0" y="450.0" text-anchor="end" class="rot">M3 a/A,D c/C,D</text>
+  <text x="220.0" y="464.0" text-anchor="end" class="rot">g/G,D t/T,D</text>
+  <text x="220.0" y="478.0" text-anchor="end" class="rot">(meio achado)</text>
+  <path d="M207.5,770.9 C182.6,799.9 182.6,720.1 207.5,749.1" class="seta-all"/>
+  <text x="168.0" y="760.0" text-anchor="end" class="rot">M12 a/A,D c/C,D</text>
+  <text x="168.0" y="774.0" text-anchor="end" class="rot">g/G,D t/T,D</text>
+  <path d="M255.0,760.0 Q565.0,760.0 875.0,760.0" class="seta-all"/>
+  <text x="565.0" y="750.0" text-anchor="middle" class="rot">M13 &gt;/&gt;,E</text>
+  <path d="M910.9,782.5 C939.9,807.4 860.1,807.4 889.1,782.5" class="seta-all"/>
+  <text x="900.0" y="832.0" text-anchor="middle" class="rot">M14 A/A,E C/C,E G/G,E</text>
+  <text x="900.0" y="846.0" text-anchor="middle" class="rot">T/T,E a/a,E c/c,E</text>
+  <text x="900.0" y="860.0" text-anchor="middle" class="rot">g/g,E t/t,E */*,E</text>
+  <path d="M900.0,735.0 Q900.0,560.0 900.0,385.0" class="seta-all"/>
+  <text x="892.0" y="518.0" text-anchor="end" class="rot">M15 &lt;/&lt;,D</text>
+  <path d="M889.1,337.5 C860.1,312.6 939.9,312.6 910.9,337.5" class="seta-all"/>
+  <text x="900.0" y="296.0" text-anchor="middle" class="rot">M16 */*,D</text>
+  <path d="M908.7,383.4 Q947.5,487.5 986.3,591.6" class="seta-all"/>
+  <text x="979.7633646524058" y="553.9437682775102" text-anchor="start" class="rot">M18 &gt;/&gt;,P</text>
+  <path d="M877.5,371.0 Q700.0,457.5 522.5,544.0" class="seta-all"/>
+  <text x="682.2471910112359" y="458.1544943820225" text-anchor="middle" class="rot">M17 a/*,D</text>
+  <path d="M510.9,577.5 C539.9,602.4 460.1,602.4 489.1,577.5" class="seta-all"/>
+  <text x="500.0" y="627.0" text-anchor="middle" class="rot">M19 a/a,D c/c,D</text>
+  <text x="500.0" y="641.0" text-anchor="middle" class="rot">g/g,D t/t,D</text>
+  <text x="500.0" y="655.0" text-anchor="middle" class="rot">*/*,D</text>
+  <path d="M522.2,566.4 Q700.0,657.5 877.8,748.6" class="seta-all"/>
+  <text x="736.6604004966588" y="697.3634552545376" text-anchor="end" class="rot">M20 A/*,E</text>
+  <path d="M517.3,537.0 Q700.0,347.5 882.7,158.0" class="seta-all"/>
+  <text x="692.0" y="347.5" text-anchor="end" class="rot">M21 C/C,P</text>
+  <text x="692.0" y="361.5" text-anchor="end" class="rot">G/G,P</text>
+  <text x="692.0" y="375.5" text-anchor="end" class="rot">T/T,P</text>
+  <path d="M882.6,377.9 Q805.0,457.5 727.4,537.1" class="seta-all"/>
+  <text x="785.0807825421939" y="490.1539337066958" text-anchor="start" class="rot">M17 c/*,D</text>
+  <path d="M720.9,577.5 C749.9,602.4 670.1,602.4 699.1,577.5" class="seta-all"/>
+  <text x="710.0" y="627.0" text-anchor="middle" class="rot">M19 a/a,D c/c,D</text>
+  <text x="710.0" y="641.0" text-anchor="middle" class="rot">g/g,D t/t,D</text>
+  <text x="710.0" y="655.0" text-anchor="middle" class="rot">*/*,D</text>
+  <path d="M727.0,573.3 Q805.0,657.5 883.0,741.7" class="seta-all"/>
+  <text x="813.0" y="663.5" text-anchor="start" class="rot">M20 C/*,E</text>
+  <path d="M720.4,532.3 Q805.0,347.5 889.6,162.7" class="seta-all"/>
+  <text x="797.0" y="347.5" text-anchor="end" class="rot">M21 A/A,P</text>
+  <text x="797.0" y="361.5" text-anchor="end" class="rot">G/G,P</text>
+  <text x="797.0" y="375.5" text-anchor="end" class="rot">T/T,P</text>
+  <path d="M917.4,377.9 Q995.0,457.5 1072.6,537.1" class="seta-all"/>
+  <text x="1014.9192174578062" y="490.1539337066958" text-anchor="end" class="rot">M17 g/*,D</text>
+  <path d="M1100.9,577.5 C1129.9,602.4 1050.1,602.4 1079.1,577.5" class="seta-all"/>
+  <text x="1090.0" y="627.0" text-anchor="middle" class="rot">M19 a/a,D c/c,D</text>
+  <text x="1090.0" y="641.0" text-anchor="middle" class="rot">g/g,D t/t,D</text>
+  <text x="1090.0" y="655.0" text-anchor="middle" class="rot">*/*,D</text>
+  <path d="M1073.0,573.3 Q995.0,657.5 917.0,741.7" class="seta-all"/>
+  <text x="987.0" y="663.5" text-anchor="end" class="rot">M20 G/*,E</text>
+  <path d="M1079.6,532.3 Q995.0,347.5 910.4,162.7" class="seta-all"/>
+  <text x="1003.0" y="347.5" text-anchor="start" class="rot">M21 A/A,P</text>
+  <text x="1003.0" y="361.5" text-anchor="start" class="rot">C/C,P</text>
+  <text x="1003.0" y="375.5" text-anchor="start" class="rot">T/T,P</text>
+  <path d="M922.5,371.0 Q1100.0,457.5 1277.5,544.0" class="seta-all"/>
+  <text x="1117.7528089887642" y="458.1544943820225" text-anchor="middle" class="rot">M17 t/*,D</text>
+  <path d="M1310.9,577.5 C1339.9,602.4 1260.1,602.4 1289.1,577.5" class="seta-all"/>
+  <text x="1300.0" y="627.0" text-anchor="middle" class="rot">M19 a/a,D c/c,D</text>
+  <text x="1300.0" y="641.0" text-anchor="middle" class="rot">g/g,D t/t,D</text>
+  <text x="1300.0" y="655.0" text-anchor="middle" class="rot">*/*,D</text>
+  <path d="M1277.8,566.4 Q1100.0,657.5 922.2,748.6" class="seta-all"/>
+  <text x="1063.3395995033413" y="697.3634552545376" text-anchor="start" class="rot">M20 T/*,E</text>
+  <path d="M1282.7,537.0 Q1100.0,347.5 917.3,158.0" class="seta-all"/>
+  <text x="1108.0" y="347.5" text-anchor="start" class="rot">M21 A/A,P</text>
+  <text x="1108.0" y="361.5" text-anchor="start" class="rot">C/C,P</text>
+  <text x="1108.0" y="375.5" text-anchor="start" class="rot">G/G,P</text>
+  <text x="20" y="912" class="nota">Rótulo  lido/escrito,mov  (E = esquerda, D = direita, P = parado). Uma seta pode ter várias transições: M2 A/a,D C/c,D G/g,D T/t,D são 4 transições de q1 para q2.</text>
+  <text x="20" y="928" class="nota">&#x27;*&#x27; = célula conferida. Fase 3: qA, qC, qG e qT guardam no estado a base lida da 1ª cópia. Todos os símbolos dos rótulos são símbolos reais de Γ.</text>
 </svg>
 <div class="legenda">Figura 3 — Diagrama de estados do ALL (<code>docs/diagramas/all.svg</code>), com os quatro estados
 da fase 3 (qA, qC, qG, qT) e as transições de cada um.</div></div>

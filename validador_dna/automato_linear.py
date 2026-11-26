@@ -56,34 +56,31 @@ ESTADOS: dict[str, str] = {
     ESTADO_REJEITA: "rejeição (parada)",
 }
 
-# Regras esquematicas das fases 1 e 2 (X em {A,C,G,T}; x = minuscula de X).
-# Na fase 3 cada regra e escrita para os estados reais qA, qC, qG, qT (um por base carregada).
-REGRAS: list[dict[str, str]] = [
-    {"id": "M1", "delta": "δ(q0, <) = (q1, <, D)", "descricao": "sai do marcador esquerdo"},
-    {"id": "M2", "delta": "δ(q1, X) = (q2, x, D)", "descricao": "marca o extremo esquerdo (X → x)"},
-    {"id": "M3", "delta": "δ(q1, x) = (q5, X, D)", "descricao": "não há base livre: meio encontrado; restaura a 1ª célula da 2ª metade"},
-    {"id": "M4", "delta": "δ(q1, >) = (qrj, >, P)", "descricao": "entrada vazia: REJEITA"},
-    {"id": "M5", "delta": "δ(q2, X) = (q2, X, D)", "descricao": "atravessa bases não marcadas"},
-    {"id": "M6", "delta": "δ(q2, x) = (q3, x, E)", "descricao": "achou a marca da direita: recua"},
-    {"id": "M7", "delta": "δ(q2, >) = (q3, >, E)", "descricao": "achou o marcador direito: recua"},
-    {"id": "M8", "delta": "δ(q3, X) = (q4, x, E)", "descricao": "marca o extremo direito (X → x)"},
-    {"id": "M9", "delta": "δ(q3, x) = (qrj, x, P)", "descricao": "base sem par: comprimento ímpar, REJEITA"},
-    {"id": "M10", "delta": "δ(q4, X) = (q4, X, E)", "descricao": "volta sobre bases não marcadas"},
-    {"id": "M11", "delta": "δ(q4, x) = (q1, x, D)", "descricao": "achou a última marca da esquerda"},
-    {"id": "M12", "delta": "δ(q5, x) = (q5, X, D)", "descricao": "restaura a 2ª metade (x → X)"},
-    {"id": "M13", "delta": "δ(q5, >) = (q6, >, E)", "descricao": "2ª metade restaurada"},
-    {"id": "M14", "delta": "δ(q6, s) = (q6, s, E),  s ∈ {A,C,G,T,a,c,g,t,*}", "descricao": "retorna à esquerda"},
-    {"id": "M15", "delta": "δ(q6, <) = (q7, <, D)", "descricao": "chegou ao marcador esquerdo"},
-    {"id": "M16", "delta": "δ(q7, *) = (q7, *, D)", "descricao": "pula bases já conferidas"},
-    *({"id": "M17", "delta": f"δ(q7, {X.lower()}) = (q{X}, *, D)",
-       "descricao": f"pega '{X.lower()}' da 1ª cópia, grava '*' e carrega {X} no estado q{X}"} for X in BASES),
-    {"id": "M18", "delta": "δ(q7, >) = (qac, >, P)", "descricao": "tudo conferido: ACEITA"},
-    *({"id": "M19", "delta": f"δ(q{X}, s) = (q{X}, s, D),  s ∈ {{a,c,g,t,*}}",
-       "descricao": f"q{X} atravessa o resto da 1ª cópia e as conferidas da 2ª"} for X in BASES),
-    *({"id": "M20", "delta": f"δ(q{X}, {X}) = (q6, *, E)",
-       "descricao": f"q{X} encontra {X} na 2ª cópia: confere e volta"} for X in BASES),
-    *({"id": "M21", "delta": f"δ(q{X}, Y) = (qrj, Y, P),  Y ∈ {{{', '.join(Y for Y in BASES if Y != X)}}}",
-       "descricao": f"q{X} encontra outra base: REJEITA"} for X in BASES),
+# Descricao de cada regra. As transicoes concretas de cada regra (so com simbolos reais de Γ,
+# sem metavariaveis) sao obtidas da tabela TRANSICOES, abaixo, em REGRAS.
+# Formato: (regra, estado de origem ou None, estado de destino ou None, descricao)
+_DESCRICOES: list[tuple[str, str | None, str | None, str]] = [
+    ("M1", None, None, "sai do marcador esquerdo"),
+    ("M2", None, None, "marca o extremo esquerdo (maiúscula → minúscula)"),
+    ("M3", None, None, "não há base livre: meio encontrado; restaura a 1ª célula da 2ª metade"),
+    ("M4", None, None, "entrada vazia: REJEITA"),
+    ("M5", None, None, "atravessa bases não marcadas"),
+    ("M6", None, None, "achou a marca da direita: recua"),
+    ("M7", None, None, "achou o marcador direito: recua"),
+    ("M8", None, None, "marca o extremo direito (maiúscula → minúscula)"),
+    ("M9", None, None, "base sem par: comprimento ímpar, REJEITA"),
+    ("M10", None, None, "volta sobre bases não marcadas"),
+    ("M11", None, None, "achou a última marca da esquerda"),
+    ("M12", None, None, "restaura a 2ª metade (minúscula → maiúscula)"),
+    ("M13", None, None, "2ª metade restaurada"),
+    ("M14", None, None, "retorna à esquerda"),
+    ("M15", None, None, "chegou ao marcador esquerdo"),
+    ("M16", None, None, "pula bases já conferidas"),
+    *(("M17", None, "q" + X, f"pega '{X.lower()}' da 1ª cópia, grava '*' e carrega {X} no estado q{X}") for X in BASES),
+    ("M18", None, None, "tudo conferido: ACEITA"),
+    *(("M19", "q" + X, None, f"q{X} atravessa o resto da 1ª cópia e as conferidas da 2ª") for X in BASES),
+    *(("M20", "q" + X, None, f"q{X} encontra {X} na 2ª cópia: confere e volta") for X in BASES),
+    *(("M21", "q" + X, None, f"q{X} encontra outra base: REJEITA") for X in BASES),
 ]
 
 
@@ -149,6 +146,21 @@ def _gerar_transicoes() -> dict[tuple[str, str], TransicaoALL]:
 
 
 TRANSICOES: dict[tuple[str, str], TransicaoALL] = _gerar_transicoes()
+
+
+def _montar_regras() -> list[dict]:
+    regras = []
+    for regra, origem, destino, descricao in _DESCRICOES:
+        ts = [t for t in TRANSICOES.values() if t.regra == regra
+              and (origem is None or t.origem == origem) and (destino is None or t.destino == destino)]
+        concretas = [f"δ({t.origem}, {t.lido}) = ({t.destino}, {t.escrito}, {t.movimento})" for t in ts]
+        regras.append({"id": regra, "transicoes": concretas, "delta": "; ".join(concretas), "descricao": descricao})
+    assert sum(len(r["transicoes"]) for r in regras) == len(TRANSICOES)  # cada transição em exatamente uma linha
+    return regras
+
+
+# Regras com as transições concretas (o que aparece nas tabelas, no relatório e nos diagramas).
+REGRAS: list[dict] = _montar_regras()
 
 
 class LimiteDaFitaViolado(RuntimeError):
